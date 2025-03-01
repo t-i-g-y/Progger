@@ -8,6 +8,12 @@ public class GoToSystem : MonoBehaviour
     [SerializeField] private Transform goToMarker;
     [SerializeField] private Transform player;
     private bool canGoTo = false;
+
+    private void Start()
+    {
+        
+    }
+
     private void Update()
     {
         if (canGoTo && Input.GetKeyDown(KeyCode.E))
