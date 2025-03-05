@@ -341,7 +341,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 84024999}
-  - component: {fileID: 84025000}
   m_Layer: 0
   m_Name: CodeModuleBASIC
   m_TagString: Untagged
@@ -365,22 +364,9 @@ Transform:
   - {fileID: 250143336}
   - {fileID: 594777761}
   - {fileID: 1121485082}
+  - {fileID: 386954334}
   m_Father: {fileID: 970851521}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &84025000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 84024998}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2af63524d6e2d3a4f984b49174161a8b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  console: {fileID: 0}
-  codeableAreaRenderer: {fileID: 0}
 --- !u!1 &100205306
 GameObject:
   m_ObjectHideFlags: 0
@@ -1249,6 +1235,38 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3635164100579155307, guid: 410284d3e2b07584f851a2531a076e91, type: 3}
   m_PrefabInstance: {fileID: 1571716569}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &386954333
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 386954334}
+  m_Layer: 0
+  m_Name: CodeBlockUI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &386954334
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 386954333}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 12, y: 6, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1956280316}
+  m_Father: {fileID: 84024999}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &416091891
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1742,7 +1760,7 @@ Transform:
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.51, y: -1.38, z: -10}
+  m_LocalPosition: {x: 19.48, y: -1.38, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1755,15 +1773,15 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a410d78b72ec51b49a18bc924e4a578f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minX: -20
-  maxX: 20
-  minY: -10
-  maxY: 10
+  minX: -100
+  maxX: 200
+  minY: -100
+  maxY: 200
 --- !u!4 &536723645 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 160553375512517330, guid: bf0a96d278b13884f96e392f1fd28575, type: 3}
@@ -2780,7 +2798,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 970851520}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -2986,6 +3004,12 @@ MonoBehaviour:
   codeBlocks:
   - {fileID: 9039698955561502272, guid: 61c4931808a37554981f9d81e1fb7d09, type: 3}
   languages: 00000000
+  codeableArea: {fileID: 594777760}
+  moduleUI: {fileID: 386954333}
+  mainCamera: {fileID: 519420031}
+  cameraTarget: {fileID: 594777761}
+  cameraZoom: 5
+  codeBlockContainer: {fileID: 1956280316}
 --- !u!70 &1121485084
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -4279,6 +4303,37 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &1956280315
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1956280316}
+  m_Layer: 0
+  m_Name: CodeBlockContainer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1956280316
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1956280315}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 386954334}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &2021089412
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4526,7 +4581,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7489511503710861672, guid: f2da6941029ab5645b4ba5a82001be7a, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 12.63
+      value: 12.67
       objectReference: {fileID: 0}
     - target: {fileID: 7489511503710861672, guid: f2da6941029ab5645b4ba5a82001be7a, type: 3}
       propertyPath: m_LocalPosition.y
