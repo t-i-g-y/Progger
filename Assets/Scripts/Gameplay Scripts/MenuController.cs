@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class MenuController : MonoBehaviour
 {
-    public GameObject menuCanvas;
+    [SerializeField] private GameObject menuCanvas;
 
     private void Start()
     {
