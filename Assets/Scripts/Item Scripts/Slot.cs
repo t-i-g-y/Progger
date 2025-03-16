@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class Slot : MonoBehaviour
 {
-    private GameObject _currentItem;
+    public GameObject _currentItem;
 
-    public GameObject currentItem
+    public GameObject CurrentItem
     {
         get => _currentItem;
         set => _currentItem = value;

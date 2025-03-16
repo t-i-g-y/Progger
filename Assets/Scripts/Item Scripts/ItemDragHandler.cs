@@ -45,19 +45,19 @@ public class ItemDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
         if (dropSlot != null)
         {
-            if (dropSlot.currentItem != null)
+            if (dropSlot.CurrentItem != null)
             {
-                dropSlot.currentItem.transform.SetParent(originalSlot.transform);
-                originalSlot.currentItem = dropSlot.currentItem;
-                dropSlot.currentItem.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+                dropSlot.CurrentItem.transform.SetParent(originalSlot.transform);
+                originalSlot.CurrentItem = dropSlot.CurrentItem;
+                dropSlot.CurrentItem.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
             }
             else
             {
-                originalSlot.currentItem = null;
+                originalSlot.CurrentItem = null;
             }
 
             transform.SetParent(dropSlot.transform);
-            dropSlot.currentItem = gameObject;
+            dropSlot.CurrentItem = gameObject;
         }
         else
         {

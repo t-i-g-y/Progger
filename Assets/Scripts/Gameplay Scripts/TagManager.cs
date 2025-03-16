@@ -4,6 +4,7 @@ using UnityEngine;
 
 public static class TagManager
 {
+    public static string ITEM_TAG = "Item";
     public static string PLAYER_TAG = "Player";
     public static string GROUND_TAG = "Environment";
     public static string MOVEABLE_OBJECT_TAG = "Moveable Object";
