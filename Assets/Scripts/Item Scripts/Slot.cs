@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Slot : MonoBehaviour
 {
-    public GameObject _currentItem;
+    private GameObject _currentItem;
 
     public GameObject CurrentItem
     {

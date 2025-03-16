@@ -9,6 +9,7 @@ TagManager:
   - Language
   - Health
   - Enemy
+  - Item
   layers:
   - Default
   - TransparentFX
@@ -57,4 +58,7 @@ TagManager:
     locked: 0
   - name: Player
     uniqueID: 606273511
+    locked: 0
+  - name: Item
+    uniqueID: 45329169
     locked: 0

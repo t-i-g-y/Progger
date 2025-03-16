@@ -5,11 +5,11 @@ using UnityEngine;
 
 public class PlayerItemCollector : MonoBehaviour
 {
-    private InventoryController _inventoryController;
+    private PlayerInventoryController _inventoryController;
 
     private void Start()
     {
-        _inventoryController = FindObjectOfType<InventoryController>();
+        _inventoryController = FindObjectOfType<PlayerInventoryController>();
     }
 
     private void OnTriggerEnter2D(Collider2D other)

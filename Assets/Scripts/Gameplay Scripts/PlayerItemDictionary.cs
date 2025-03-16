@@ -32,7 +32,7 @@ public class PlayerItemDictionary : MonoBehaviour
 
         if (prefab == null)
         {
-            Debug.LogWarning($"Item with ID {ID} not found in dictionary");
+            Debug.LogWarning($"Item with ID:{ID} not found in dictionary");
         }
 
         return prefab;
