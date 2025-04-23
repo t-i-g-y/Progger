@@ -33,4 +33,6 @@ public class PlayerAnimation : MonoBehaviour
         else if (direction < 0)
             sr.flipX = true;
     }
+
+    
 }
