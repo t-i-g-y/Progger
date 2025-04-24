@@ -35,6 +35,14 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float maxFallSpeed = 20f;
     [SerializeField] private float fallMultiplier = 2.5f;
 
+    [Header("Dashing")] 
+    [SerializeField] private float dashSpeed = 20f;
+    [SerializeField] private float dashDuration = 0.1f;
+    [SerializeField] private float dashCooldown = 0.2f;
+    private bool isDashing;
+    private bool canDash = true;
+    private TrailRenderer trailRenderer;
+    
     [Header("Wall Movement")]
     [SerializeField] private Transform wallCheck;
     [SerializeField] private Vector2 wallCheckSize = new Vector2(0.5f, 0.05f);
@@ -61,16 +69,19 @@ public class PlayerMovement : MonoBehaviour
         myBody = GetComponent<Rigidbody2D>();
         //playerAnimation = GetComponent<PlayerAnimation>();
         myTransform = GetComponent<Transform>();
+        trailRenderer = GetComponent<TrailRenderer>();
     }
 
     private void Update()
     {
-        
+        if (isDashing)
+            return;
         HandleJumping();
         HandleGravity();
         
         HandleWallSlide();
         HandleWallJump();
+        HandleDash();
         if (!isWallJumping)
         {
             horizontalMovement = Input.GetAxisRaw(TagManager.HORIZONTAL_MOVEMENT);
@@ -81,6 +92,9 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (isDashing)
+            return;
+        
         if (!isWallJumping)
             HandleMovement();
     }
@@ -168,6 +182,14 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    private void HandleDash()
+    {
+        if (Input.GetKeyDown(KeyCode.Q) && canDash)
+        {
+            Debug.Log("Dash pressed");
+            StartCoroutine(DashCoroutine());
+        }
+    }
     private void CancelWallJump()
     {
         isWallJumping = false;
@@ -213,6 +235,24 @@ public class PlayerMovement : MonoBehaviour
         {
             myBody.gravityScale = baseGravity;
         }
+    }
+
+    private IEnumerator DashCoroutine()
+    {
+        canDash = false;
+        isDashing = true;
+        
+        float dashDirection = isFacingRight ? 1f : -1f;
+        myBody.velocity = new Vector2(transform.localScale.x * dashSpeed, 0);
+        Debug.Log(myBody.velocity);
+        trailRenderer.emitting = true;
+        yield return new WaitForSeconds(dashDuration);
+        
+        myBody.velocity = new Vector2(0f, myBody.velocity.y);
+        isDashing = false;
+        trailRenderer.emitting = false;
+        yield return new WaitForSeconds(dashCooldown);
+        canDash = true;
     }
     
     private void OnDrawGizmosSelected()
