@@ -10,6 +10,7 @@ TagManager:
   - Health
   - Enemy
   - Item
+  - Platform
   layers:
   - Default
   - TransparentFX

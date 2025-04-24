@@ -22,7 +22,7 @@ public class PlayerHealth : MonoBehaviour
     private void Awake()
     {
         health = maxHealth;
-        SetHearts();
+        //SetHearts();
     }
     
     private void SetHearts()
@@ -43,8 +43,8 @@ public class PlayerHealth : MonoBehaviour
     public void TakeDamage(float damage)
     {
         health -= damage;
-        
-        SetHearts();
+        Debug.Log($"Took {damage} damage\nHealth: {health}");
+        //SetHearts();
         if (health <= 0f)
         {
             Destroy(gameObject);

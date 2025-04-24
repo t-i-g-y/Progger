@@ -8,13 +8,14 @@ using Vector3 = UnityEngine.Vector3;
 
 public class PlayerMovement : MonoBehaviour
 {
-    private BoxCollider2D boxCol2D;
-    private Rigidbody2D myBody;
-    private Transform myTransform;
+    private BoxCollider2D playerCollider;
+    private Rigidbody2D playerBody;
+    private Transform playerTransform;
     private PlayerAnimation playerAnimation;
     
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 5f;
+    private float speedMultiplier = 1f;
     private float horizontalMovement;
     private Vector3 movePos;
     
@@ -30,6 +31,11 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private LayerMask groundMask;
     private RaycastHit2D groundCast;
 
+
+    [Header("Dropping")] 
+    [SerializeField] private float dropTime = 0.25f;
+    private bool isOnPlatform;
+    
     [Header("Gravity")] 
     [SerializeField] private float baseGravity = 2;
     [SerializeField] private float maxFallSpeed = 20f;
@@ -56,20 +62,37 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float wallJumpTime = 0.5f;
     private float wallJumpTimer;
     public Vector2 wallJumpPower = new Vector2(5f, 10f);
+
+    public float SpeedMultiplier
+    {
+        get => speedMultiplier;
+        set => speedMultiplier = value;
+    }
     
     public int MaxJumps
     {
         get => maxJumps;
         set => maxJumps = value;
     }
+
+    public bool CanDash
+    {
+        get => canDash;
+        set => canDash = value;
+    }
     
     private void Awake()
     {
-        boxCol2D = GetComponent<BoxCollider2D>();
-        myBody = GetComponent<Rigidbody2D>();
+        playerCollider = GetComponent<BoxCollider2D>();
+        playerBody = GetComponent<Rigidbody2D>();
         //playerAnimation = GetComponent<PlayerAnimation>();
-        myTransform = GetComponent<Transform>();
+        playerTransform = GetComponent<Transform>();
         trailRenderer = GetComponent<TrailRenderer>();
+    }
+
+    private void Start()
+    {
+        SpeedItem.OnSpeedCollected += StartSpeedBoost;
     }
 
     private void Update()
@@ -78,10 +101,10 @@ public class PlayerMovement : MonoBehaviour
             return;
         HandleJumping();
         HandleGravity();
-        
         HandleWallSlide();
         HandleWallJump();
         HandleDash();
+        HandleDrop();
         if (!isWallJumping)
         {
             horizontalMovement = Input.GetAxisRaw(TagManager.HORIZONTAL_MOVEMENT);
@@ -89,7 +112,7 @@ public class PlayerMovement : MonoBehaviour
         }
         
     }
-
+    
     private void FixedUpdate()
     {
         if (isDashing)
@@ -99,19 +122,31 @@ public class PlayerMovement : MonoBehaviour
             HandleMovement();
     }
 
+    private void StartSpeedBoost(float multiplier)
+    {
+        StartCoroutine(SpeedBoostCoroutine(multiplier));
+    }
+
+    private IEnumerator SpeedBoostCoroutine(float multiplier)
+    {
+        speedMultiplier = multiplier;
+        yield return new WaitForSeconds(2f);
+        speedMultiplier = 1f;
+    }
+    
     private void HandleMovement()
     {
         if (horizontalMovement > 0)
-            myBody.velocity = new Vector2(moveSpeed, myBody.velocity.y);
+            playerBody.velocity = new Vector2(moveSpeed * speedMultiplier, playerBody.velocity.y);
         else if (horizontalMovement < 0)
-            myBody.velocity = new Vector2(-moveSpeed, myBody.velocity.y);
+            playerBody.velocity = new Vector2(-moveSpeed * speedMultiplier, playerBody.velocity.y);
         else
-            myBody.velocity = new Vector2(0f, myBody.velocity.y);
+            playerBody.velocity = new Vector2(0f, playerBody.velocity.y);
     }
 
     private void HandleAnimation()
     {
-        playerAnimation.ChangeDirection((int)myBody.velocity.x);
+        playerAnimation.ChangeDirection((int)playerBody.velocity.x);
     }
 
     private void HandleJumping()
@@ -134,7 +169,7 @@ public class PlayerMovement : MonoBehaviour
             if (wallJumpTimer > 0f)
             {
                 isWallJumping = true;
-                myBody.velocity = new Vector2(wallJumpDirection * wallJumpPower.x, wallJumpPower.y);
+                playerBody.velocity = new Vector2(wallJumpDirection * wallJumpPower.x, wallJumpPower.y);
                 wallJumpTimer = 0;
 
                 if (transform.localScale.x != wallJumpDirection)
@@ -157,7 +192,7 @@ public class PlayerMovement : MonoBehaviour
         {
             Debug.Log("Is on wall");
             isWallSliding = true;
-            myBody.velocity = new Vector2(myBody.velocity.x, Mathf.Max(myBody.velocity.y, -wallSlideSpeed));
+            playerBody.velocity = new Vector2(playerBody.velocity.x, Mathf.Max(playerBody.velocity.y, -wallSlideSpeed));
         }
         else
         {
@@ -200,9 +235,9 @@ public class PlayerMovement : MonoBehaviour
         if (wallJumpTimer > 0f)
         {
             isWallJumping = true;
-            myBody.velocity = new Vector2(wallJumpDirection * wallJumpPower.x, wallJumpPower.y);
+            playerBody.velocity = new Vector2(wallJumpDirection * wallJumpPower.x, wallJumpPower.y);
         }
-        myBody.velocity = Vector2.up * jumpForce;
+        playerBody.velocity = Vector2.up * jumpForce;
         jumpsRemaining--;
         jumped = true;
         
@@ -211,7 +246,7 @@ public class PlayerMovement : MonoBehaviour
 
     private bool IsGrounded()
     {
-        groundCast = Physics2D.BoxCast(boxCol2D.bounds.center, boxCol2D.bounds.size, 0f, Vector2.down, 0.1f,
+        groundCast = Physics2D.BoxCast(playerCollider.bounds.center, playerCollider.bounds.size, 0f, Vector2.down, 0.1f,
             groundMask);
         //Debug.DrawRay(boxCol2D.bounds.center + new Vector3(boxCol2D.bounds.extents.x, 0f), Vector2.down * (boxCol2D.bounds.extents.y + 0.01f), Color.red);
         //Debug.DrawRay(boxCol2D.bounds.center - new Vector3(boxCol2D.bounds.extents.x, 0f), Vector2.down * (boxCol2D.bounds.extents.y + 0.01f), Color.red);
@@ -226,14 +261,14 @@ public class PlayerMovement : MonoBehaviour
 
     private void HandleGravity()
     {
-        if (myBody.velocity.y < 0)
+        if (playerBody.velocity.y < 0)
         {
-            myBody.gravityScale = baseGravity * fallMultiplier;
-            myBody.velocity = new Vector2(myBody.velocity.x, Mathf.Max(myBody.velocity.y, -maxFallSpeed));
+            playerBody.gravityScale = baseGravity * fallMultiplier;
+            playerBody.velocity = new Vector2(playerBody.velocity.x, Mathf.Max(playerBody.velocity.y, -maxFallSpeed));
         }
         else
         {
-            myBody.gravityScale = baseGravity;
+            playerBody.gravityScale = baseGravity;
         }
     }
 
@@ -243,17 +278,32 @@ public class PlayerMovement : MonoBehaviour
         isDashing = true;
         
         float dashDirection = isFacingRight ? 1f : -1f;
-        myBody.velocity = new Vector2(transform.localScale.x * dashSpeed, 0);
-        Debug.Log(myBody.velocity);
+        playerBody.velocity = new Vector2(transform.localScale.x * dashSpeed, 0);
+        Debug.Log(playerBody.velocity);
         trailRenderer.emitting = true;
         yield return new WaitForSeconds(dashDuration);
         
-        myBody.velocity = new Vector2(0f, myBody.velocity.y);
+        playerBody.velocity = new Vector2(0f, playerBody.velocity.y);
         isDashing = false;
         trailRenderer.emitting = false;
         yield return new WaitForSeconds(dashCooldown);
         canDash = true;
     }
+
+    private void HandleDrop()
+    {
+        if (Input.GetKeyDown(KeyCode.S) && IsGrounded() && isOnPlatform && playerCollider.enabled)
+        {
+            StartCoroutine(DropCoroutine());
+        }
+    }
+    private IEnumerator DropCoroutine()
+    {
+        playerCollider.enabled = false;
+        yield return new WaitForSeconds(dropTime);
+        playerCollider.enabled = true;
+    }
+    
     
     private void OnDrawGizmosSelected()
     {
@@ -269,6 +319,15 @@ public class PlayerMovement : MonoBehaviour
             Vector3 localScale = transform.localScale;
             localScale.x *= -1;
             transform.localScale = localScale;
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag(TagManager.PLATFORM_TAG))
+        {
+            isOnPlatform = true;
+            Debug.Log("is on platform");
         }
     }
 }
