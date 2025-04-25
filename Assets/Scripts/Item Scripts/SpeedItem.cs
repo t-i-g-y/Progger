@@ -11,6 +11,7 @@ public class SpeedItem : MonoBehaviour
     public void Collect()
     {
         OnSpeedCollected?.Invoke(speedMultiplier);
+        SoundEffectManager.Play("SpeedItem");
         Destroy(gameObject);
     }
 }

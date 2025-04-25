@@ -44,6 +44,7 @@ public class PlayerHealth : MonoBehaviour
     {
         health -= damage;
         Debug.Log($"Took {damage} damage\nHealth: {health}");
+        SoundEffectManager.Play("PlayerHit");
         //SetHearts();
         if (health <= 0f)
         {
