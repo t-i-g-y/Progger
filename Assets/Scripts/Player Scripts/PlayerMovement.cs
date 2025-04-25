@@ -9,6 +9,7 @@ using Vector3 = UnityEngine.Vector3;
 public class PlayerMovement : MonoBehaviour
 {
     private BoxCollider2D playerCollider;
+    private CircleCollider2D collectorCollider;
     private Rigidbody2D playerBody;
     private Transform playerTransform;
     private PlayerAnimation playerAnimation;

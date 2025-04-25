@@ -6,24 +6,32 @@ using UnityEngine;
 public class PlayerItemCollector : MonoBehaviour
 {
     private PlayerInventoryController _inventoryController;
-
+    private bool inventoryUnlocked = false;
     private void Start()
     {
-        _inventoryController = FindObjectOfType<PlayerInventoryController>();
+        //_inventoryController = FindObjectOfType<PlayerInventoryController>();
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag(TagManager.ITEM_TAG))
         {
-            PlayerItem item = other.GetComponent<PlayerItem>();
-            if (item != null)
+            if (inventoryUnlocked)
             {
-                bool itemAdded = _inventoryController.AddItem(other.gameObject);
-                if (itemAdded)
+                PlayerItem item = other.GetComponent<PlayerItem>();
+                if (item != null)
                 {
-                    Destroy(other.gameObject);
+                    bool itemAdded = _inventoryController.AddItem(other.gameObject);
+                    if (itemAdded)
+                    {
+                        Destroy(other.gameObject);
+                    }
                 }
+            }
+            SpeedItem speedItem = other.GetComponent<SpeedItem>();
+            if (speedItem != null)
+            {
+                speedItem.Collect();
             }
         }
     }
