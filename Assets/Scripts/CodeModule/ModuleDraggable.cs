@@ -3,39 +3,66 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class ModuleDraggable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
+public class ModuleDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-    private Transform codeableArea;
-    private bool isDragging = false;
+    private ModuleObject currentObject;
+    private Module currentModule;
+    private RectTransform rectTransform;
+    private Canvas canvas;
 
-    public void SetCodeableArea(Transform area)
+    public void Intialize(ModuleObject moduleObject, Module module)
     {
-        codeableArea = area;
+        currentObject = moduleObject;
+        currentModule = module;
+        rectTransform = GetComponent<RectTransform>();
+        canvas = GetComponentInParent<Canvas>();
+        Sprite prefabSprite = currentObject.prefab.GetComponent<SpriteRenderer>()?.sprite;
+        GetComponent<UnityEngine.UI.Image>().sprite = prefabSprite;
     }
 
-    public void OnPointerDown(PointerEventData eventData)
+    public void OnBeginDrag(PointerEventData eventData)
     {
-        isDragging = true;
+        
     }
-
     public void OnDrag(PointerEventData eventData)
     {
-        if (isDragging)
+        rectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor;
+    }
+
+    public void OnEndDrag(PointerEventData eventData)
+    {
+        Vector2 worldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
+        foreach (var area in currentModule.AvailableAreas)
         {
-            Vector3 position = Camera.main.ScreenToWorldPoint(eventData.position);
-            position.z = 0;
-            transform.position = position;
+            if (area.IsInside(worldPosition))
+            {
+                Vector2 snappedPosition = SnapToGrid(worldPosition, 0.16f);
+                GameObject placed = Instantiate(currentObject.prefab, snappedPosition, Quaternion.identity);
+                currentObject.isPlaced = true;
+                Destroy(gameObject);
+                break;
+            }
+        }
+
+        if (!currentObject.isPlaced)
+        {
+            rectTransform.anchoredPosition = Vector2.zero;
         }
     }
 
-    public void OnPointerUp(PointerEventData eventData)
+    private Vector2 SnapToGrid(Vector2 position, float gridSize)
     {
-        isDragging = false;
-        if (!codeableArea.GetComponent<Collider2D>().bounds.Contains(transform.position))
-        {
-            Destroy(gameObject);
-        }
+        float x = Mathf.Round(position.x / gridSize) * gridSize;
+        float y = Mathf.Round(position.y / gridSize) * gridSize;
+        return new Vector2(x, y);
     }
-    
-    
+}
+
+[System.Serializable]
+public struct ModuleObject
+{
+    public GameObject prefab;
+    public bool isPlaced;
+    public bool isMultipart;
 }

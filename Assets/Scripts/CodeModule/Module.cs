@@ -6,15 +6,53 @@ using UnityEngine;
 public class Module : MonoBehaviour
 {
     [SerializeField] private ModuleConsole console;
-    [SerializeField] private Renderer codeableAreaRenderer;
-    private Bounds codeableArea;
-    private void Awake()
+    [SerializeField] private Vector3 cameraFocus;
+    [SerializeField] private float cameraZoom;
+    [SerializeField] private List<ModuleObject> availableObjects;
+    [SerializeField] private List<ModuleCodeableArea> availableAreas;
+    [SerializeField] private float panTime = 0.5f;
+    private Camera mainCamera;
+
+    public List<ModuleObject> AvailableObjects
     {
-        Bounds codeableArea = codeableAreaRenderer.bounds;
+        get => availableObjects;
     }
 
-    private void Update()
+    public List<ModuleCodeableArea> AvailableAreas
     {
-        
+        get => availableAreas;
+    }
+    
+    private void Awake()
+    {
+        mainCamera = Camera.main;
+    }
+
+    public void EnterModuleMode()
+    {
+        Time.timeScale = 0f;
+        StartCoroutine(CameraPanCoroutine());
+        ModuleUIManager.Instance.OpenModuleEditor(this);
+    }
+
+    public void ExitModuleMode()
+    {
+        Time.timeScale = 1f;
+        ModuleUIManager.Instance.CLoseModuleEditor();
+    }
+
+    private IEnumerator CameraPanCoroutine()
+    {
+        float elapsedTime = 0f;
+        float startZoom = mainCamera.orthographicSize;
+        Vector3 startPosition = mainCamera.transform.position;
+        while (elapsedTime < panTime)
+        {
+            elapsedTime += Time.unscaledDeltaTime;
+            mainCamera.transform.position = Vector3.Lerp(startPosition, new Vector3(cameraFocus.x, cameraFocus.y, startPosition.z), elapsedTime / panTime);
+            mainCamera.orthographicSize = Mathf.Lerp(startZoom, cameraZoom, elapsedTime / panTime);
+            yield return null;
+        }
     }
 }
+
