@@ -37,6 +37,12 @@ public class Module : MonoBehaviour
         {
             mainCameraFollow.IsEnabled = false;
         }
+
+        foreach (var area in availableAreas)
+        {
+            area.ShowCodeableArea();
+        }
+        
         StartCoroutine(CameraPanCoroutine());
         ModuleUIManager.Instance.OpenModuleEditor(this);
     }
@@ -48,6 +54,12 @@ public class Module : MonoBehaviour
         {
             mainCameraFollow.IsEnabled = true;
         }
+        
+        foreach (var area in availableAreas)
+        {
+            area.HideCodeableArea();
+        }
+        
         ModuleUIManager.Instance.CLoseModuleEditor();
     }
 

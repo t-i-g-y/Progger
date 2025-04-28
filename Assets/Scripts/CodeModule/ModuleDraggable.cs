@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 public class ModuleDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
@@ -9,6 +11,14 @@ public class ModuleDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     private Module currentModule;
     private RectTransform rectTransform;
     private Canvas canvas;
+    private Image image;
+    [SerializeField] private Color validColor = Color.green;
+    [SerializeField] private Color invalidColor = Color.red;
+
+    private void Awake()
+    {
+        image = GetComponent<Image>();
+    }
 
     public void Intialize(ModuleObject moduleObject, Module module)
     {
@@ -27,6 +37,22 @@ public class ModuleDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     public void OnDrag(PointerEventData eventData)
     {
         rectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor;
+        
+        Vector2 worldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        bool isValid = false;
+        foreach (var area in currentModule.AvailableAreas)
+        {
+            if (area.IsInside(worldPosition))
+            {
+                isValid = true;
+                break;
+            }
+        }
+
+        if (image != null)
+        {
+            image.color = isValid ? validColor : invalidColor;
+        }
     }
 
     public void OnEndDrag(PointerEventData eventData)
