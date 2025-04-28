@@ -6,12 +6,18 @@ using UnityEngine;
 
 public class CameraFollow : MonoBehaviour
 {
+    private bool isEnabled = true;
     private Transform player;
     private Vector3 tmpPos;
 
     [SerializeField] private float minX, maxX;
     [SerializeField] private float minY, maxY;
 
+    public bool IsEnabled
+    {
+        get => isEnabled;
+        set => isEnabled = value;
+    }
     private void Awake()
     {
         player = GameObject.FindWithTag(TagManager.PLAYER_TAG).transform;
@@ -19,9 +25,9 @@ public class CameraFollow : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (!player)
+        if (!player || !isEnabled)
             return;
-
+        
         tmpPos = transform.position;
         tmpPos.x = player.position.x;
         tmpPos.y = player.position.y;

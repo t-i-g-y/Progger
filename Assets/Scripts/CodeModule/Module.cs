@@ -12,6 +12,7 @@ public class Module : MonoBehaviour
     [SerializeField] private List<ModuleCodeableArea> availableAreas;
     [SerializeField] private float panTime = 0.5f;
     private Camera mainCamera;
+    private CameraFollow mainCameraFollow;
 
     public List<ModuleObject> AvailableObjects
     {
@@ -26,11 +27,16 @@ public class Module : MonoBehaviour
     private void Awake()
     {
         mainCamera = Camera.main;
+        mainCameraFollow = mainCamera.GetComponent<CameraFollow>();
     }
 
     public void EnterModuleMode()
     {
         Time.timeScale = 0f;
+        if (mainCameraFollow != null)
+        {
+            mainCameraFollow.IsEnabled = false;
+        }
         StartCoroutine(CameraPanCoroutine());
         ModuleUIManager.Instance.OpenModuleEditor(this);
     }
@@ -38,6 +44,10 @@ public class Module : MonoBehaviour
     public void ExitModuleMode()
     {
         Time.timeScale = 1f;
+        if (mainCameraFollow != null)
+        {
+            mainCameraFollow.IsEnabled = true;
+        }
         ModuleUIManager.Instance.CLoseModuleEditor();
     }
 
@@ -51,6 +61,7 @@ public class Module : MonoBehaviour
             elapsedTime += Time.unscaledDeltaTime;
             mainCamera.transform.position = Vector3.Lerp(startPosition, new Vector3(cameraFocus.x, cameraFocus.y, startPosition.z), elapsedTime / panTime);
             mainCamera.orthographicSize = Mathf.Lerp(startZoom, cameraZoom, elapsedTime / panTime);
+            
             yield return null;
         }
     }
