@@ -1,9 +1,11 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class ModuleUIManager : MonoBehaviour
 {
+    private bool editorOpen;
     public static ModuleUIManager Instance;
     private Module currentModule;
     private List<GameObject> instantiatedPalette = new List<GameObject>();
@@ -24,17 +26,28 @@ public class ModuleUIManager : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        if (editorOpen && Input.GetKeyDown(KeyCode.R))
+        {
+            ResetModuleObjects();
+        }
+    }
+
     public void OpenModuleEditor(Module module)
     {
         moduleCanvas.SetActive(true);
         currentModule = module;
-        PopulatePalette(module.AvailableObjects);
+        editorOpen = true;
+        ClearPalette();
+        PopulatePalette(module.AvailableObjects.FindAll(obj => !obj.IsPlaced));
     }
 
-    public void CLoseModuleEditor()
+    public void CloseModuleEditor()
     {
         ClearPalette();
         moduleCanvas.SetActive(false);
+        editorOpen = false;
     }
 
     private void PopulatePalette(List<ModuleObject> prefabs)
@@ -43,7 +56,7 @@ public class ModuleUIManager : MonoBehaviour
         {
             GameObject uiElement = Instantiate(draggableObject, paletteParent);
             ModuleDraggable draggable = uiElement.GetComponent<ModuleDraggable>();
-            draggable.Intialize(prefab, currentModule);
+            draggable.Initialize(prefab, currentModule);
             instantiatedPalette.Add(uiElement);
         }
     }
@@ -55,5 +68,20 @@ public class ModuleUIManager : MonoBehaviour
             Destroy(element);
         }
         instantiatedPalette.Clear();
+    }
+
+    public void ResetModuleObjects()
+    {
+        foreach (var obj in currentModule.AvailableObjects)
+        {
+            obj.IsPlaced = false;
+        }
+
+        foreach (Transform child in currentModule.PlacedObjectsParent)
+        {
+            Destroy(child.gameObject);
+        }
+        ClearPalette();
+        PopulatePalette(currentModule.AvailableObjects);
     }
 }

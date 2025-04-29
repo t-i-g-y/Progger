@@ -12,6 +12,8 @@ public class ModuleDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     private RectTransform rectTransform;
     private Canvas canvas;
     private Image image;
+    private Vector2 originalPosition;
+    [SerializeField] private float gridSize = 0.16f;
     [SerializeField] private Color validColor = Color.green;
     [SerializeField] private Color invalidColor = Color.red;
 
@@ -20,19 +22,26 @@ public class ModuleDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         image = GetComponent<Image>();
     }
 
-    public void Intialize(ModuleObject moduleObject, Module module)
+    public void Initialize(ModuleObject moduleObject, Module module)
     {
         currentObject = moduleObject;
         currentModule = module;
         rectTransform = GetComponent<RectTransform>();
         canvas = GetComponentInParent<Canvas>();
-        Sprite prefabSprite = currentObject.prefab.GetComponent<SpriteRenderer>()?.sprite;
-        GetComponent<UnityEngine.UI.Image>().sprite = prefabSprite;
+        Sprite prefabSprite = currentObject.Prefab.GetComponent<SpriteRenderer>()?.sprite;
+        if (prefabSprite != null)
+        {
+            var image = GetComponent<Image>();
+            image.sprite = prefabSprite;
+            image.preserveAspect = true;
+            
+            rectTransform.sizeDelta = new Vector2(prefabSprite.bounds.size.x, prefabSprite.bounds.size.y) * 64;
+        }
     }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        
+        originalPosition = rectTransform.anchoredPosition;
     }
     public void OnDrag(PointerEventData eventData)
     {
@@ -58,22 +67,25 @@ public class ModuleDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     public void OnEndDrag(PointerEventData eventData)
     {
         Vector2 worldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-
+        //bool placed = false;
+        
         foreach (var area in currentModule.AvailableAreas)
         {
             if (area.IsInside(worldPosition))
             {
-                Vector2 snappedPosition = SnapToGrid(worldPosition, 0.16f);
-                GameObject placed = Instantiate(currentObject.prefab, snappedPosition, Quaternion.identity);
-                currentObject.isPlaced = true;
+                Vector2 snappedPosition = SnapToGrid(worldPosition, gridSize);
+                GameObject placed = Instantiate(currentObject.Prefab, snappedPosition, Quaternion.identity, currentModule.PlacedObjectsParent);
+                currentObject.IsPlaced = true;
                 Destroy(gameObject);
+                //placed = true;
                 break;
             }
         }
-
-        if (!currentObject.isPlaced)
+        
+        if (!currentObject.IsPlaced)
         {
-            rectTransform.anchoredPosition = Vector2.zero;
+            rectTransform.anchoredPosition = originalPosition;
+            GetComponent<Image>().color = Color.white;
         }
     }
 
@@ -83,12 +95,4 @@ public class ModuleDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         float y = Mathf.Round(position.y / gridSize) * gridSize;
         return new Vector2(x, y);
     }
-}
-
-[System.Serializable]
-public struct ModuleObject
-{
-    public GameObject prefab;
-    public bool isPlaced;
-    public bool isMultipart;
 }
