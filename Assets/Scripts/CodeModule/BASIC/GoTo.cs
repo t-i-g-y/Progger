@@ -6,12 +6,12 @@ using UnityEngine;
 public class GoToSystem : MonoBehaviour
 {
     [SerializeField] private Transform goToMarker;
-    [SerializeField] private Transform player;
-    private bool canGoTo = false;
+    private GameObject player;
+    private bool canGoTo;
 
     private void Start()
     {
-        
+        player = GameObject.FindGameObjectWithTag(TagManager.PLAYER_TAG);
     }
 
     private void Update()
@@ -41,6 +41,6 @@ public class GoToSystem : MonoBehaviour
 
     private void PlayerGoTo()
     {
-        player.position = goToMarker.position;
+        player.transform.position = goToMarker.position;
     }
 }

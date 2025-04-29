@@ -28,10 +28,18 @@ public class ModuleDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         currentModule = module;
         rectTransform = GetComponent<RectTransform>();
         canvas = GetComponentInParent<Canvas>();
-        Sprite prefabSprite = currentObject.Prefab.GetComponent<SpriteRenderer>()?.sprite;
+        Sprite prefabSprite;
+
+        if (currentObject.IsMultipart)
+        {
+            prefabSprite = currentObject.Prefab.transform.GetChild(0).GetComponent<SpriteRenderer>()?.sprite;
+        }
+        else
+        {
+            prefabSprite = currentObject.Prefab.GetComponent<SpriteRenderer>()?.sprite;
+        }
         if (prefabSprite != null)
         {
-            var image = GetComponent<Image>();
             image.sprite = prefabSprite;
             image.preserveAspect = true;
             
@@ -76,19 +84,29 @@ public class ModuleDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, I
                 Vector2 snappedPosition = SnapToGrid(worldPosition, gridSize);
                 GameObject placed = Instantiate(currentObject.Prefab, snappedPosition, Quaternion.identity, currentModule.PlacedObjectsParent);
                 currentObject.IsPlaced = true;
+                if (currentObject.IsMultipart)
+                {
+                    SetupMultipartChildren(placed);
+                }
                 Destroy(gameObject);
-                //placed = true;
-                break;
+                return;
             }
         }
         
-        if (!currentObject.IsPlaced)
-        {
-            rectTransform.anchoredPosition = originalPosition;
-            GetComponent<Image>().color = Color.white;
-        }
+        rectTransform.anchoredPosition = originalPosition;
+        GetComponent<Image>().color = Color.white;
     }
 
+    private void SetupMultipartChildren(GameObject parent)
+    {
+        Transform root = parent.transform;
+        for (int i = 1; i < root.childCount; i++)
+        {
+            GameObject child = root.GetChild(i).gameObject;
+            child.AddComponent<ModuleChildDraggable>().Initialize(currentModule, gridSize, validColor, invalidColor);
+        }
+    }
+    
     private Vector2 SnapToGrid(Vector2 position, float gridSize)
     {
         float x = Mathf.Round(position.x / gridSize) * gridSize;
