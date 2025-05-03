@@ -10,6 +10,7 @@ public static class TagManager
     public static string GROUND_TAG = "Environment";
     public static string MOVEABLE_OBJECT_TAG = "Moveable Object";
     public static string LANGUAGE_TAG = "Language";
+    public static string CLIMBABLE_TAG = "Climbable";
     
     public static string HORIZONTAL_MOVEMENT = "Horizontal";
     public static string JUMP_BUTTON = "Jump";

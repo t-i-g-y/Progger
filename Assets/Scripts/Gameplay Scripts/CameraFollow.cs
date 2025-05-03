@@ -10,6 +10,7 @@ public class CameraFollow : MonoBehaviour
     private Transform player;
     private Vector3 tmpPos;
 
+    [SerializeField] private Transform target;
     [SerializeField] private float minX, maxX;
     [SerializeField] private float minY, maxY;
 
@@ -23,23 +24,22 @@ public class CameraFollow : MonoBehaviour
         player = GameObject.FindWithTag(TagManager.PLAYER_TAG).transform;
     }
 
+    public void SetTarget(Transform newTarget)
+    {
+        target = newTarget;
+    }
+
     private void LateUpdate()
     {
-        if (!player || !isEnabled)
+        if (!target || !IsEnabled)
             return;
-        
-        tmpPos = transform.position;
-        tmpPos.x = player.position.x;
-        tmpPos.y = player.position.y;
 
-        if (tmpPos.x < minX)
-            tmpPos.x = minX;
-        if (tmpPos.x > maxX)
-            tmpPos.x = maxX;
-        if (tmpPos.y < minY)
-            tmpPos.y = minY;
-        if (tmpPos.y > maxY)
-            tmpPos.y = maxY;
+        Vector3 tmpPos = transform.position;
+        tmpPos.x = target.position.x;
+        tmpPos.y = target.position.y;
+
+        tmpPos.x = Mathf.Clamp(tmpPos.x, minX, maxX);
+        tmpPos.y = Mathf.Clamp(tmpPos.y, minY, maxY);
 
         transform.position = tmpPos;
     }

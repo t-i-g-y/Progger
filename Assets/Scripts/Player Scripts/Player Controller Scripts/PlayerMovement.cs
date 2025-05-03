@@ -70,7 +70,13 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float wallJumpTime = 0.5f;
     private float wallJumpTimer;
     public Vector2 wallJumpPower = new Vector2(5f, 10f);
-    
+
+    [Header("Climbing")] 
+    [SerializeField] private float climbSpeed = 5f;
+    [SerializeField] private Transform topCheck;
+    [SerializeField] private float topCheckRadius = 0.1f;
+    private bool canClimb;
+    private bool isClimbing;
     //[Header("Debugging")]
     private float jumpPressTimestamp;
     private float jumpExecutionTimestamp;
@@ -111,9 +117,9 @@ public class PlayerMovement : MonoBehaviour
     {
         if (InputBlocked)
             return;
-        
         if (isDashing)
             return;
+        HandleClimbing();
         HandleJumping();
         HandleGravity();
         if (AbilityManager.Instance.AbilityUnlocked(ProgrammingLanguage.Python))
@@ -181,6 +187,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void HandleJumping()
     {
+        if (isClimbing)
+            return;
         //IsGrounded();
         if (Input.GetKeyDown(KeyCode.Space) && IsGrounded())
         {
@@ -334,7 +342,11 @@ public class PlayerMovement : MonoBehaviour
 
     private void HandleGravity()
     {
-        if (playerBody.velocity.y < 0)
+        if (isClimbing)
+        {
+            playerBody.gravityScale = 0f;
+        }
+        else if (playerBody.velocity.y < 0)
         {
             playerBody.gravityScale = baseGravity * fallMultiplier;
             playerBody.velocity = new Vector2(playerBody.velocity.x, Mathf.Max(playerBody.velocity.y, -maxFallSpeed));
@@ -365,7 +377,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void HandleDrop()
     {
-        if (Input.GetKeyDown(KeyCode.S) && IsGrounded() && isOnPlatform && playerCollider.enabled)
+        if (Input.GetKeyDown(KeyCode.S) && IsGrounded() && isOnPlatform)
         {
             StartCoroutine(DropCoroutine());
         }
@@ -376,7 +388,6 @@ public class PlayerMovement : MonoBehaviour
         yield return new WaitForSeconds(dropTime);
         playerCollider.enabled = true;
     }
-    
     
     private void OnDrawGizmosSelected()
     {
@@ -395,12 +406,62 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    private void HandleClimbing()
+    {
+        
+        if (canClimb && (Input.GetButton(TagManager.JUMP_BUTTON) || Input.GetKey(KeyCode.W)))
+        {
+            playerBody.velocity = new Vector2(playerBody.velocity.x, climbSpeed);
+            isClimbing = true;
+        }
+        else if (canClimb && (Input.GetKey(KeyCode.S)))
+        {
+            playerBody.velocity = new Vector2(playerBody.velocity.x, -climbSpeed);
+            isClimbing = true;
+        }
+        else if (canClimb)
+        {
+            playerBody.velocity = new Vector2(playerBody.velocity.x, 0);
+            isClimbing = true;
+        }
+        else
+        {
+            isClimbing = false;
+        }
+    }
+    
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag(TagManager.PLATFORM_TAG))
         {
             isOnPlatform = true;
             Debug.Log("is on platform");
+        }
+    }
+
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag(TagManager.PLATFORM_TAG))
+        {
+            isOnPlatform = false;
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.gameObject.CompareTag(TagManager.CLIMBABLE_TAG))
+        {
+            canClimb = true;
+            Debug.Log("Can climb");
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.gameObject.CompareTag(TagManager.CLIMBABLE_TAG))
+        {
+            canClimb = false;
+            Debug.Log("Cannot climb");
         }
     }
 }
