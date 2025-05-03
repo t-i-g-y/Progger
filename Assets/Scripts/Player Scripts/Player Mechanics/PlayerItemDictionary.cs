@@ -16,23 +16,23 @@ public class PlayerItemDictionary : MonoBehaviour
         {
             if (itemPrefabs[i] != null)
             {
-                itemPrefabs[i].ID = i + 1;
+                itemPrefabs[i].PrefabID = i + 1;
             }
         }
 
         foreach (PlayerItem item in itemPrefabs)
         {
-            playerItemDictionary[item.ID] = item.gameObject;
+            playerItemDictionary[item.PrefabID] = item.gameObject;
         }
     }
 
-    public GameObject GetItemPrefab(int ID)
+    public GameObject GetItemPrefab(int PrefabID)
     {
-        playerItemDictionary.TryGetValue(ID, out GameObject prefab);
+        playerItemDictionary.TryGetValue(PrefabID, out GameObject prefab);
 
         if (prefab == null)
         {
-            Debug.LogWarning($"Item with ID:{ID} not found in dictionary");
+            Debug.LogWarning($"Item with ID:{PrefabID} not found in dictionary");
         }
 
         return prefab;

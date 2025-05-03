@@ -50,7 +50,10 @@ public class ModuleDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     public void OnBeginDrag(PointerEventData eventData)
     {
         originalPosition = rectTransform.anchoredPosition;
+        transform.SetParent(canvas.transform, false);
+        transform.SetAsLastSibling();
     }
+
     public void OnDrag(PointerEventData eventData)
     {
         rectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor;

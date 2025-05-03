@@ -22,7 +22,7 @@ public class SaveController : MonoBehaviour
         SaveData saveData = new SaveData
         {
             playerPosition = GameObject.FindGameObjectWithTag(TagManager.PLAYER_TAG).transform.position,
-            inventorySaveData = _inventoryController.GetInventoryItems()
+            //inventorySaveData = _inventoryController.GetInventoryItems()
         };
         
         File.WriteAllText(_saveLocation, JsonUtility.ToJson(saveData));
@@ -34,7 +34,7 @@ public class SaveController : MonoBehaviour
         {
             SaveData saveData = JsonUtility.FromJson<SaveData>(File.ReadAllText(_saveLocation));
             GameObject.FindGameObjectWithTag(TagManager.PLAYER_TAG).transform.position = saveData.playerPosition;
-            _inventoryController.SetInventoryItems(saveData.inventorySaveData);
+            //_inventoryController.SetInventoryItems(saveData.inventorySaveData);
         }
         else
         {

@@ -6,6 +6,7 @@ using UnityEngine;
 public class MenuController : MonoBehaviour
 {
     [SerializeField] private GameObject menuCanvas;
+    [SerializeField] private GameObject singleSlotUI;
 
     private void Start()
     {
@@ -16,7 +17,10 @@ public class MenuController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Tab)) 
         {
+            bool newState = !menuCanvas.activeSelf;
             menuCanvas.SetActive(!menuCanvas.activeSelf);
+            Time.timeScale = menuCanvas.activeSelf ? 0f : 1f;
+            singleSlotUI.SetActive(!newState);
         }
     }
 }
