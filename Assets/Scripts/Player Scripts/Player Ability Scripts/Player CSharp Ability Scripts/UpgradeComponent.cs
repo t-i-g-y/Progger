@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.Serialization;
 
 public enum UpgradeType
 {
@@ -15,31 +16,42 @@ public enum UpgradeType
 
 public class UpgradeComponent : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-    public UpgradeType type;
-    public float value;
-
-    [HideInInspector] public Transform originalParent;
-
     private CanvasGroup canvasGroup;
     private RectTransform rectTransform;
-
+    private Transform originalParent;
+    private UpgradeComponentData _data;
+    private bool wasInSlot;
+    public UpgradeComponentData ComponentData
+    {
+        get => _data; 
+        set => _data = value;
+    }
+    
+    public bool WasInSlot => wasInSlot;
     private void Awake()
     {
         canvasGroup = GetComponent<CanvasGroup>();
         rectTransform = GetComponent<RectTransform>();
     }
 
-    public void Initialize(UpgradeType type, float value, string labelText)
+    public void Initialize(UpgradeComponentData data)
     {
-        this.type = type;
-        this.value = value;
-        GetComponentInChildren<TMP_Text>().text = labelText;
+        _data = data;
+        GetComponentInChildren<TMP_Text>().text = GetLabelText();
     }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
         originalParent = transform.parent;
-        transform.SetParent(transform.root);
+        wasInSlot = false;
+        
+        if (originalParent.TryGetComponent(out UpgradeSlot slot))
+        {
+            UpgradeComponentManager.Instance.UnassignComponent(slot.currentUpgrade.ComponentData);
+            slot.currentUpgrade = null;
+        }
+
+        transform.SetParent(transform.root, true);
         canvasGroup.blocksRaycasts = false;
     }
 
@@ -54,8 +66,29 @@ public class UpgradeComponent : MonoBehaviour, IBeginDragHandler, IDragHandler, 
         
         if (transform.parent == transform.root)
         {
-            transform.SetParent(originalParent);
-            rectTransform.anchoredPosition = Vector2.zero;
+            if (originalParent.TryGetComponent(out UpgradeSlot slot))
+            {
+                //slot.ClearSlot();
+                
+            }
+
+            UpgradeComponentManager.Instance.ReturnToComponentList(this);
         }
+    }
+
+    private string GetLabelText()
+    {
+        switch (_data.type)
+        {
+            case UpgradeType.MaxJump:
+                return "+1 Max Jump";
+            case UpgradeType.Speed:
+                return "+50% Speed";
+            case UpgradeType.JumpBoost:
+                return "+50% Jump";
+            case UpgradeType.Health:
+                return "+3 Health";
+        }
+        return null;
     }
 }

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
 
@@ -14,16 +15,16 @@ public class PlayerMovement : MonoBehaviour
     private Transform playerTransform;
     private PlayerAnimation playerAnimation;
     [HideInInspector] public static bool InputBlocked;
-
+    
     [Header("Movement")]
-    [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] private float _moveSpeed = 5f;
     private float speedMultiplier = 1f;
     private float horizontalMovement;
     private Vector3 movePos;
     
     [Header("Jumping")]
-    [SerializeField] private float normalJumpForce = 8f;
-    [SerializeField] private float doubleJumpForce = 6f;
+    [SerializeField] private float _normalJumpForce = 8f;
+    [SerializeField] private float _doubleJumpForce = 6f;
     private bool jumped;
     private float jumpForce = 5f;
     private int maxJumps = 1;
@@ -31,66 +32,93 @@ public class PlayerMovement : MonoBehaviour
     private float jumpMultiplier = 1f;
     
     [Header("Long Jumping")]
-    [SerializeField] private float longJumpChargeTime = 1f;
-    [SerializeField] private float longJumpForce = 10f;
+    [SerializeField] private float _longJumpChargeTime = 1f;
+    [SerializeField] private float _longJumpForce = 10f;
     private float jumpPressDuration = 0f;
     private bool isChargingJump;
     
     [Header("Ground Check")]
-    [SerializeField] private LayerMask groundMask;
+    [SerializeField] private LayerMask _groundMask;
     private RaycastHit2D groundCast;
     
     [Header("Dropping")] 
-    [SerializeField] private float dropTime = 0.25f;
+    [SerializeField] private float _dropTime = 0.25f;
     private bool isOnPlatform;
     
     [Header("Gravity")] 
-    [SerializeField] private float baseGravity = 2;
-    [SerializeField] private float maxFallSpeed = 15f;
-    [SerializeField] private float fallMultiplier = 2f;
-
+    [SerializeField] private float _baseGravity = 2;
+    [SerializeField] private float _maxFallSpeed = 15f;
+    [SerializeField] private float _fallMultiplier = 2f;
+    
     [Header("Dashing")] 
-    [SerializeField] private float dashSpeed = 20f;
-    [SerializeField] private float dashDuration = 0.1f;
-    [SerializeField] private float dashCooldown = 1f;
+    [SerializeField] private float _dashSpeed = 20f;
+    [SerializeField] private float _dashDuration = 0.1f;
+    [SerializeField] private float _dashCooldown = 1f;
     private bool isDashing;
     private bool canDash;
     private TrailRenderer trailRenderer;
     
     [Header("Wall Movement")]
-    [SerializeField] private Transform wallCheck;
-    [SerializeField] private Vector2 wallCheckSize = new Vector2(0.5f, 0.05f);
-    [SerializeField] private LayerMask wallMask;
-    [SerializeField] private float wallSlideSpeed = 2f;
+    [SerializeField] private Transform _wallCheck;
+    [SerializeField] private Vector2 _wallCheckSize = new Vector2(0.5f, 0.05f);
+    [SerializeField] private LayerMask _wallMask;
+    [SerializeField] private float _wallSlideSpeed = 2f;
+    [SerializeField] private float _wallJumpTime = 0.5f;
+    [SerializeField] private Vector2 _wallJumpPower = new Vector2(5f, 10f);
     private bool isFacingRight = true;
     private bool isWallSliding;
     private RaycastHit2D wallCast;
     private bool isWallJumping;
     private float wallJumpDirection;
-    [SerializeField] private float wallJumpTime = 0.5f;
     private float wallJumpTimer;
-    public Vector2 wallJumpPower = new Vector2(5f, 10f);
-
+    
     [Header("Climbing")] 
-    [SerializeField] private float climbSpeed = 5f;
-    [SerializeField] private Transform topCheck;
-    [SerializeField] private float topCheckRadius = 0.1f;
+    [SerializeField] private float _climbSpeed = 5f;
+    [SerializeField] private Transform _topCheck;
+    [SerializeField] private float _topCheckRadius = 0.1f;
     private bool canClimb;
     private bool isClimbing;
+    
     //[Header("Debugging")]
     private float jumpPressTimestamp;
     private float jumpExecutionTimestamp;
 
+    public float JumpMultiplier
+    {
+        get => jumpMultiplier;
+        set
+        {
+            jumpMultiplier = value;
+            if (jumpMultiplier < 1f)
+            {
+                jumpMultiplier = 1f;
+            }
+        }
+    }
     public float SpeedMultiplier
     {
         get => speedMultiplier;
-        set => speedMultiplier = value;
+        set
+        {
+            speedMultiplier = value;
+            if (speedMultiplier < 1f)
+            {
+                speedMultiplier = 1f;
+            }
+        }
     }
     
     public int MaxJumps
     {
         get => maxJumps;
-        set => maxJumps = value;
+        set
+        {
+            maxJumps = value;
+            if (maxJumps < 1)
+            {
+                maxJumps = 1;
+            }
+        }
     }
 
     public bool CanDash
@@ -115,7 +143,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
-        if (InputBlocked)
+        if (InputBlocked || Time.timeScale == 0f)
             return;
         if (isDashing)
             return;
@@ -145,51 +173,34 @@ public class PlayerMovement : MonoBehaviour
         if (!isWallJumping)
             HandleMovement();
     }
-
-    public void StartSpeedBoost(float multiplier)
-    {
-        StartCoroutine(SpeedBoostCoroutine(multiplier));
-    }
-
-    public void StartJumpBoost(float multiplier)
-    {
-        StartCoroutine(JumpBoostCoroutine(multiplier));
-    }
-
-    private IEnumerator SpeedBoostCoroutine(float multiplier)
-    {
-        speedMultiplier = multiplier;
-        yield return new WaitForSeconds(2f);
-        speedMultiplier = 1f;
-    }
-
-    private IEnumerator JumpBoostCoroutine(float multiplier)
-    {
-        jumpMultiplier = multiplier;
-        yield return new WaitForSeconds(2f);
-        jumpMultiplier = 1f;
-    }
     
     private void HandleMovement()
     {
         if (horizontalMovement > 0)
-            playerBody.velocity = new Vector2(moveSpeed * speedMultiplier, playerBody.velocity.y);
+            playerBody.velocity = new Vector2(_moveSpeed * speedMultiplier, playerBody.velocity.y);
         else if (horizontalMovement < 0)
-            playerBody.velocity = new Vector2(-moveSpeed * speedMultiplier, playerBody.velocity.y);
+            playerBody.velocity = new Vector2(-_moveSpeed * speedMultiplier, playerBody.velocity.y);
         else
             playerBody.velocity = new Vector2(0f, playerBody.velocity.y);
     }
-
-    private void HandleAnimation()
+    
+    public void StartSpeedBoost(float multiplier)
     {
-        playerAnimation.ChangeDirection((int)playerBody.velocity.x);
+        StartCoroutine(SpeedBoostCoroutine(multiplier));
     }
-
+    
+    private IEnumerator SpeedBoostCoroutine(float multiplier)
+    {
+        speedMultiplier += multiplier;
+        yield return new WaitForSeconds(2f);
+        speedMultiplier = 1f;
+    }
+    
     private void HandleJumping()
     {
         if (isClimbing)
             return;
-        //IsGrounded();
+        
         if (Input.GetKeyDown(KeyCode.Space) && IsGrounded())
         {
             jumpPressTimestamp = Time.time;
@@ -212,12 +223,12 @@ public class PlayerMovement : MonoBehaviour
 
             if (AbilityManager.Instance.AbilityUnlocked(ProgrammingLanguage.BASIC))
             {
-                float chargeRatio = Mathf.Clamp01(jumpPressDuration / longJumpChargeTime);
-                force = Mathf.Lerp(normalJumpForce, longJumpForce, chargeRatio);
+                float chargeRatio = Mathf.Clamp01(jumpPressDuration / _longJumpChargeTime);
+                force = Mathf.Lerp(_normalJumpForce, _longJumpForce, chargeRatio);
             }
             else
             {
-                force = normalJumpForce;
+                force = _normalJumpForce;
             }
 
             jumpForce = force;
@@ -227,14 +238,14 @@ public class PlayerMovement : MonoBehaviour
         if (!IsGrounded() && Input.GetKeyDown(KeyCode.Space) && jumped && jumpsRemaining > 0 
             && AbilityManager.Instance.AbilityUnlocked(ProgrammingLanguage.CPlusPlus))
         {
-            jumpForce = doubleJumpForce;
+            jumpForce = _doubleJumpForce;
             Jump();
         }
 
         if (wallJumpTimer > 0f)
         {
             isWallJumping = true;
-            playerBody.velocity = new Vector2(wallJumpDirection * wallJumpPower.x, wallJumpPower.y);
+            playerBody.velocity = new Vector2(wallJumpDirection * _wallJumpPower.x, _wallJumpPower.y);
             wallJumpTimer = 0;
 
             if (transform.localScale.x != wallJumpDirection)
@@ -245,54 +256,10 @@ public class PlayerMovement : MonoBehaviour
                 transform.localScale = localScale;
             }
 
-            Invoke(nameof(CancelWallJump), wallJumpTime + 0.1f);
+            Invoke(nameof(CancelWallJump), _wallJumpTime + 0.1f);
         }
     }
-
-    private void HandleWallSlide()
-    {
-        if (!IsGrounded() && IsOnWall() && horizontalMovement != 0)
-        {
-            Debug.Log("Is on wall");
-            isWallSliding = true;
-            playerBody.velocity = new Vector2(playerBody.velocity.x, Mathf.Max(playerBody.velocity.y, -wallSlideSpeed));
-        }
-        else
-        {
-            isWallSliding = false;
-        }
-        
-    }
-
-    private void HandleWallJump()
-    {
-        if (isWallSliding)
-        {
-            isWallJumping = false;
-            wallJumpDirection = -transform.localScale.x;
-            wallJumpTimer = wallJumpTime;
-            
-            CancelInvoke(nameof(CancelWallJump));
-        }
-        else if (wallJumpTimer > 0f)
-        {
-            wallJumpTimer -= Time.deltaTime;
-        }
-    }
-
-    private void HandleDash()
-    {
-        if (Input.GetKeyDown(KeyCode.Q) && canDash)
-        {
-            Debug.Log("Dash pressed");
-            StartCoroutine(DashCoroutine());
-        }
-    }
-    private void CancelWallJump()
-    {
-        isWallJumping = false;
-    }
-
+    
     private void Jump()
     {
         float startY = transform.position.y;
@@ -300,7 +267,7 @@ public class PlayerMovement : MonoBehaviour
         if (wallJumpTimer > 0f)
         {
             isWallJumping = true;
-            playerBody.velocity = new Vector2(wallJumpDirection * wallJumpPower.x, wallJumpPower.y);
+            playerBody.velocity = new Vector2(wallJumpDirection * _wallJumpPower.x, _wallJumpPower.y);
         }
         playerBody.velocity = Vector2.up * (jumpMultiplier * jumpForce);
         StartCoroutine(LogJumpHeight(startY));
@@ -324,57 +291,29 @@ public class PlayerMovement : MonoBehaviour
         float height = maxY - startY;
         Debug.Log($"Jump height: {height:F2}");
     }
-
+    
+    public void StartJumpBoost(float multiplier)
+    {
+        StartCoroutine(JumpBoostCoroutine(multiplier));
+    }
+    
+    private IEnumerator JumpBoostCoroutine(float multiplier)
+    {
+        jumpMultiplier += multiplier;
+        yield return new WaitForSeconds(2f);
+        jumpMultiplier = 1f;
+    }
+    
     private bool IsGrounded()
     {
         groundCast = Physics2D.BoxCast(playerCollider.bounds.center, playerCollider.bounds.size, 0f, Vector2.down, 0.1f,
-            groundMask);
+            _groundMask);
         //Debug.DrawRay(boxCol2D.bounds.center + new Vector3(boxCol2D.bounds.extents.x, 0f), Vector2.down * (boxCol2D.bounds.extents.y + 0.01f), Color.red);
         //Debug.DrawRay(boxCol2D.bounds.center - new Vector3(boxCol2D.bounds.extents.x, 0f), Vector2.down * (boxCol2D.bounds.extents.y + 0.01f), Color.red);
         //Debug.DrawRay(boxCol2D.bounds.center - new Vector3(boxCol2D.bounds.extents.x, boxCol2D.bounds.extents.y + 0.01f), Vector2.right * boxCol2D.bounds.size.x, Color.red);
         return groundCast.collider != null;
     }
     
-    private bool IsOnWall()
-    {
-        return Physics2D.OverlapBox(wallCheck.position, wallCheckSize, 0f, wallMask);
-    }
-
-    private void HandleGravity()
-    {
-        if (isClimbing)
-        {
-            playerBody.gravityScale = 0f;
-        }
-        else if (playerBody.velocity.y < 0)
-        {
-            playerBody.gravityScale = baseGravity * fallMultiplier;
-            playerBody.velocity = new Vector2(playerBody.velocity.x, Mathf.Max(playerBody.velocity.y, -maxFallSpeed));
-        }
-        else
-        {
-            playerBody.gravityScale = baseGravity;
-        }
-    }
-
-    private IEnumerator DashCoroutine()
-    {
-        canDash = false;
-        isDashing = true;
-        
-        float dashDirection = isFacingRight ? 1f : -1f;
-        playerBody.velocity = new Vector2(transform.localScale.x * dashSpeed, 0);
-        Debug.Log(playerBody.velocity);
-        trailRenderer.emitting = true;
-        yield return new WaitForSeconds(dashDuration);
-        
-        playerBody.velocity = new Vector2(0f, playerBody.velocity.y);
-        isDashing = false;
-        trailRenderer.emitting = false;
-        yield return new WaitForSeconds(dashCooldown);
-        canDash = true;
-    }
-
     private void HandleDrop()
     {
         if (Input.GetKeyDown(KeyCode.S) && IsGrounded() && isOnPlatform)
@@ -385,14 +324,104 @@ public class PlayerMovement : MonoBehaviour
     private IEnumerator DropCoroutine()
     {
         playerCollider.enabled = false;
-        yield return new WaitForSeconds(dropTime);
+        yield return new WaitForSeconds(_dropTime);
         playerCollider.enabled = true;
+    }
+    
+    private void HandleGravity()
+    {
+        if (isClimbing)
+        {
+            playerBody.gravityScale = 0f;
+        }
+        else if (playerBody.velocity.y < 0)
+        {
+            playerBody.gravityScale = _baseGravity * _fallMultiplier;
+            playerBody.velocity = new Vector2(playerBody.velocity.x, Mathf.Max(playerBody.velocity.y, -_maxFallSpeed));
+        }
+        else
+        {
+            playerBody.gravityScale = _baseGravity;
+        }
+    }
+    
+    private void HandleDash()
+    {
+        if (Input.GetKeyDown(KeyCode.Q) && canDash)
+        {
+            Debug.Log("Dash pressed");
+            StartCoroutine(DashCoroutine());
+        }
+    }
+    
+    private IEnumerator DashCoroutine()
+    {
+        canDash = false;
+        isDashing = true;
+        
+        float dashDirection = isFacingRight ? 1f : -1f;
+        playerBody.velocity = new Vector2(transform.localScale.x * _dashSpeed, 0);
+        Debug.Log(playerBody.velocity);
+        trailRenderer.emitting = true;
+        yield return new WaitForSeconds(_dashDuration);
+        
+        playerBody.velocity = new Vector2(0f, playerBody.velocity.y);
+        isDashing = false;
+        trailRenderer.emitting = false;
+        yield return new WaitForSeconds(_dashCooldown);
+        canDash = true;
+    }
+    
+    private void HandleWallSlide()
+    {
+        if (!IsGrounded() && IsOnWall() && horizontalMovement != 0)
+        {
+            Debug.Log("Is on wall");
+            isWallSliding = true;
+            playerBody.velocity = new Vector2(playerBody.velocity.x, Mathf.Max(playerBody.velocity.y, -_wallSlideSpeed));
+        }
+        else
+        {
+            isWallSliding = false;
+        }
+        
+    }
+
+    private void HandleWallJump()
+    {
+        if (isWallSliding)
+        {
+            isWallJumping = false;
+            wallJumpDirection = -transform.localScale.x;
+            wallJumpTimer = _wallJumpTime;
+            
+            CancelInvoke(nameof(CancelWallJump));
+        }
+        else if (wallJumpTimer > 0f)
+        {
+            wallJumpTimer -= Time.deltaTime;
+        }
+    }
+    
+    private void CancelWallJump()
+    {
+        isWallJumping = false;
+    }
+    
+    private bool IsOnWall()
+    {
+        return Physics2D.OverlapBox(_wallCheck.position, _wallCheckSize, 0f, _wallMask);
+    }
+    
+    private void HandleAnimation()
+    {
+        playerAnimation.ChangeDirection((int)playerBody.velocity.x);
     }
     
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.white;
-        Gizmos.DrawWireCube(wallCheck.position, wallCheckSize);
+        Gizmos.DrawWireCube(_wallCheck.position, _wallCheckSize);
     }
 
     private void Flip()
@@ -411,12 +440,12 @@ public class PlayerMovement : MonoBehaviour
         
         if (canClimb && (Input.GetButton(TagManager.JUMP_BUTTON) || Input.GetKey(KeyCode.W)))
         {
-            playerBody.velocity = new Vector2(playerBody.velocity.x, climbSpeed);
+            playerBody.velocity = new Vector2(playerBody.velocity.x, _climbSpeed);
             isClimbing = true;
         }
         else if (canClimb && (Input.GetKey(KeyCode.S)))
         {
-            playerBody.velocity = new Vector2(playerBody.velocity.x, -climbSpeed);
+            playerBody.velocity = new Vector2(playerBody.velocity.x, -_climbSpeed);
             isClimbing = true;
         }
         else if (canClimb)

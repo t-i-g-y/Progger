@@ -5,6 +5,7 @@ using UnityEngine;
 public static class TagManager
 {
     public static string ITEM_TAG = "Item";
+    public static string COMPONENT_ITEM_TAG = "ComponentItem";
     public static string PLAYER_TAG = "Player";
     public static string PLATFORM_TAG = "Platform";
     public static string GROUND_TAG = "Environment";

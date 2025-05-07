@@ -143,8 +143,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb7d4c5b35877d94ebcda78ef628c506, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ID: 1
+  PrefabID: 0
   ItemName: SpeedItem
-  ItemIcon: {fileID: 0}
   EffectType: 1
-  EffectValue: 1
+  EffectValue: 5
+  ItemIcon: {fileID: 0}

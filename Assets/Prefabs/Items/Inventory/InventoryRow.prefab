@@ -511,11 +511,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e77458bb89ce364a8e994212d6f8fba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  idText: {fileID: 3940322246073241219}
-  nameText: {fileID: 399713784696815919}
-  effectText: {fileID: 8735986895674021668}
-  icon: {fileID: 6636576651915636792}
-  selectionHighlight: {fileID: 6033698731002030988}
+  _IDText: {fileID: 3940322246073241219}
+  _nameText: {fileID: 399713784696815919}
+  _effectText: {fileID: 8735986895674021668}
+  _icon: {fileID: 6636576651915636792}
+  _selectionHighlight: {fileID: 6033698731002030988}
 --- !u!114 &3586431729080016946
 MonoBehaviour:
   m_ObjectHideFlags: 0

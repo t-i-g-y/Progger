@@ -2,34 +2,42 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class InventoryRow : MonoBehaviour
 {
-    [SerializeField] private TMP_Text idText;
-    [SerializeField] private TMP_Text nameText;
-    [SerializeField] private TMP_Text effectText;
-    [SerializeField] private Image icon;
-    [SerializeField] private Image selectionHighlight;
+    [SerializeField] private TMP_Text _IDText;
+    [SerializeField] private TMP_Text _nameText;
+    [SerializeField] private TMP_Text _effectText;
+    [SerializeField] private Image _icon;
+    [SerializeField] private Image _selectionHighlight;
     
     private PlayerItem linkedItem;
-    private PlayerInventoryController inventory;
 
-    public void Initialize(PlayerItem item, PlayerInventoryController inventory)
+    public void Initialize(PlayerItem item)
     {
         linkedItem = item;
-        this.inventory = inventory;
+        
+        _IDText.text = item.ID.ToString();
+        _nameText.text = item.ItemName;
+        _effectText.text = $"{item.EffectType} +{item.EffectValue}";
+        _icon.sprite = item.ItemIcon.sprite;
+        _icon.color = item.ItemIcon.color;
+    }
 
-        idText.text = item.ID.ToString();
-        nameText.text = item.ItemName;
-        effectText.text = $"{item.EffectType} +{item.EffectValue}";
-        icon.sprite = item.ItemIcon.sprite;
-        icon.color = item.ItemIcon.color;
+    public void Initialize(UpgradeComponentItem item)
+    {
+        _IDText.text = item.ID.ToString();
+        _nameText.text = item.ItemName;
+        _effectText.text = $"{item.componentData.type} +{item.componentData.value}";
+        _icon.sprite = item.ItemIcon.sprite;
+        _icon.color = item.ItemIcon.color;
     }
     
     public void SetSelected(bool selected)
     {
-        if (selectionHighlight != null)
-            selectionHighlight.enabled = selected;
+        if (_selectionHighlight != null)
+            _selectionHighlight.enabled = selected;
     }
 }

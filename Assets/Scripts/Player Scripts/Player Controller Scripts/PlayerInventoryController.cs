@@ -7,17 +7,19 @@ using UnityEngine.UI;
 
 public class PlayerInventoryController : MonoBehaviour
 {
+    public static PlayerInventoryController Instance;
+    
     [Header("Single Slot UI")]
-    [SerializeField] private GameObject singleSlotUI;
-    [SerializeField] private Image singleSlotIcon;
-    [SerializeField] private Image consumeProgressBar;
-    [SerializeField] private float consumeHoldTime = 1.25f;
+    [SerializeField] private GameObject _singleSlotUI;
+    [SerializeField] private Image _singleSlotIcon;
+    [SerializeField] private Image _consumeProgressBar;
+    [SerializeField] private float _consumeHoldTime = 1.25f;
     
     [Header("SQL Inventory")]
-    [SerializeField] private GameObject rowPrefab;
-    [SerializeField] private Transform SQLInventoryContent;
-    [SerializeField] private GameObject SQLInventoryUI;
-    [SerializeField] private GameObject menuCanvas;
+    [SerializeField] private GameObject _rowPrefab;
+    [SerializeField] private Transform _SQLInventoryContent;
+    [SerializeField] private GameObject _SQLInventoryUI;
+    [SerializeField] private GameObject _menuCanvas;
     private PlayerItem currentHotbarItem;
     private List<PlayerItem> SQLItems = new();
     private List<InventoryRow> SQLRows = new();
@@ -27,10 +29,30 @@ public class PlayerInventoryController : MonoBehaviour
     private bool wasSQLUnlocked;
     private GameObject player;
     private bool IsSQLUnlocked => AbilityManager.Instance.AbilityUnlocked(ProgrammingLanguage.SQL);
+    
+    [Header("C# Component Inventory")]
+    [SerializeField] private Transform _cSharpInventoryContent;
+    
+    private List<UpgradeComponentItem> csharpComponents = new();
+
+    public List<UpgradeComponentItem> CsharpComponents
+    {
+        get => csharpComponents;
+        set => csharpComponents = value;
+    }
 
     private void Awake()
     {
-        player = GameObject.FindGameObjectWithTag(TagManager.PLAYER_TAG);
+        if (Instance == null)
+        {
+            Instance = this;
+            player = GameObject.FindGameObjectWithTag(TagManager.PLAYER_TAG);
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
     private void Update()
     {
@@ -54,16 +76,16 @@ public class PlayerInventoryController : MonoBehaviour
 
     private void HandleHotbarInput()
     {
-        if (currentHotbarItem == null || menuCanvas.activeSelf) 
+        if (currentHotbarItem == null || _menuCanvas.activeSelf) 
             return;
 
         if (Input.GetKey(KeyCode.E))
         {
             isConsuming = true;
             consumeTimer += Time.deltaTime;
-            consumeProgressBar.fillAmount = consumeTimer / consumeHoldTime;
+            _consumeProgressBar.fillAmount = consumeTimer / _consumeHoldTime;
 
-            if (consumeTimer >= consumeHoldTime)
+            if (consumeTimer >= _consumeHoldTime)
             {
                 ConsumeHotbarItem();
             }
@@ -73,13 +95,13 @@ public class PlayerInventoryController : MonoBehaviour
         {
             isConsuming = false;
             consumeTimer = 0f;
-            consumeProgressBar.fillAmount = 0f;
+            _consumeProgressBar.fillAmount = 0f;
         }
     }
 
     private void HandleSQLInventoryInput()
     {
-        if (!IsSQLUnlocked || !menuCanvas.activeSelf || !SQLInventoryUI.activeSelf || SQLRows.Count == 0)
+        if (!IsSQLUnlocked || !_menuCanvas.activeSelf || !_SQLInventoryUI.activeSelf || SQLRows.Count == 0)
             return;
         
         if (Input.GetKeyDown(KeyCode.DownArrow))
@@ -98,7 +120,7 @@ public class PlayerInventoryController : MonoBehaviour
         }
     }
 
-    public void CollectItem(PlayerItem item)
+    public void CollectPlayerItem(PlayerItem item)
     {
         if (SQLItems.Contains(item)) 
             return;
@@ -106,6 +128,7 @@ public class PlayerInventoryController : MonoBehaviour
         if (IsSQLUnlocked)
         {
             AddToSQLInventory(item);
+            consumeTimer = 0f;
         }
         else
         {
@@ -123,13 +146,43 @@ public class PlayerInventoryController : MonoBehaviour
         }
     }
 
+    public void CollectUpgradeComponentItem(UpgradeComponentItem item)
+    {
+        if (csharpComponents.Contains(item))
+            return;
+        
+        csharpComponents.Add(item);
+        UpgradeComponentManager.Instance.AddNewComponent(item.componentData);
+        item.gameObject.SetActive(false);
+        if (IsSQLUnlocked)
+        {
+            RefreshComponentInventory();
+        }
+
+        consumeTimer = 0f;
+        Debug.Log($"{item}");
+    }
+
+    private void RefreshComponentInventory()
+    {
+        for (int i = 0; i < _cSharpInventoryContent.childCount; i++)
+            Destroy(_cSharpInventoryContent.GetChild(i).gameObject);
+        
+        for (int i = 0; i < csharpComponents.Count; i++)
+        {
+            GameObject row = Instantiate(_rowPrefab, _cSharpInventoryContent);
+            InventoryRow rowScript = row.GetComponent<InventoryRow>();
+            rowScript.Initialize(csharpComponents[i]);
+        }
+    }
+    
     private void SetHotbarItem(PlayerItem item)
     {
         currentHotbarItem = item;
-        singleSlotIcon.sprite = item.ItemIcon.sprite;
-        singleSlotIcon.color = item.ItemIcon.color;
-        singleSlotIcon.enabled = true;
-        singleSlotUI.SetActive(true);
+        _singleSlotIcon.sprite = item.ItemIcon.sprite;
+        _singleSlotIcon.color = item.ItemIcon.color;
+        _singleSlotIcon.enabled = true;
+        _singleSlotUI.SetActive(true);
         item.gameObject.SetActive(false);
     }
 
@@ -148,8 +201,8 @@ public class PlayerInventoryController : MonoBehaviour
             Destroy(currentHotbarItem.gameObject);
         }
         currentHotbarItem = null;
-        singleSlotIcon.enabled = false;
-        consumeProgressBar.fillAmount = 0f;
+        _singleSlotIcon.enabled = false;
+        _consumeProgressBar.fillAmount = 0f;
         consumeTimer = 0f;
         UpdateHotbarSlot();
     }
@@ -162,15 +215,16 @@ public class PlayerInventoryController : MonoBehaviour
 
     private void AddToSQLInventory(PlayerItem item)
     {
+        Debug.Log($"Adding {item}; Null: {item == null}");
         SQLItems.Add(item);
         item.gameObject.SetActive(false);
         RefreshSQLInventory();
-        Debug.Log($"{item}");
+        Debug.Log($"{item} added; Null: {item == null}");
         UpdateRowSelection();
         UpdateHotbarSlot();
     }
 
-    public void ConsumeSQLItem(PlayerItem item)
+    private void ConsumeSQLItem(PlayerItem item)
     {
         bool wasFirstItem = (SQLItems.Count > 0 && SQLItems[0] == item);
         ItemEffectProcessor.ApplyEffect(item, player);
@@ -184,16 +238,17 @@ public class PlayerInventoryController : MonoBehaviour
     private void RefreshSQLInventory()
     {
         SQLRows.Clear();
-        for (int i = 0; i < SQLInventoryContent.childCount; i++)
-            Destroy(SQLInventoryContent.GetChild(i).gameObject);
+        for (int i = 0; i < _SQLInventoryContent.childCount; i++)
+            Destroy(_SQLInventoryContent.GetChild(i).gameObject);
         
         selectedIndex = 0;
         
         for (int i = 0; i < SQLItems.Count; i++)
         {
-            GameObject row = Instantiate(rowPrefab, SQLInventoryContent);
+            GameObject row = Instantiate(_rowPrefab, _SQLInventoryContent);
             InventoryRow rowScript = row.GetComponent<InventoryRow>();
-            rowScript.Initialize(SQLItems[i], this);
+            Debug.Log($"Init {SQLItems[i]}; Null: {SQLItems[i] == null}");
+            rowScript.Initialize(SQLItems[i]);
             SQLRows.Add(rowScript);
         }
     }
@@ -211,13 +266,15 @@ public class PlayerInventoryController : MonoBehaviour
         if (SQLItems.Count > 0)
         {
             currentHotbarItem = SQLItems[0];
-            singleSlotIcon.sprite = currentHotbarItem.ItemIcon.sprite;
-            singleSlotIcon.color = currentHotbarItem.ItemIcon.color;
-            singleSlotIcon.enabled = true;
+            _singleSlotIcon.sprite = currentHotbarItem.ItemIcon.sprite;
+            _singleSlotIcon.color = currentHotbarItem.ItemIcon.color;
+            _singleSlotIcon.enabled = true;
         }
         else
         {
-            singleSlotIcon.enabled = false;
+            _singleSlotIcon.enabled = false;
         }
     }
+    
+    
 }
