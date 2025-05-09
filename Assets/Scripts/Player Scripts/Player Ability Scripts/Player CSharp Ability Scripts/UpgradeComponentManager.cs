@@ -61,8 +61,9 @@ public class UpgradeComponentManager : MonoBehaviour
 
             GameObject go = Instantiate(_upgradeComponentPrefab, _componentContainer);
             var comp = go.GetComponent<UpgradeComponent>();
+            Debug.Log($"Null component {comp == null}");
             comp.Initialize(data);
-        }
+        }   
 
         Debug.Log($"List built: {availableComponents.Count} available, {assignedComponents.Count} assigned");
     }

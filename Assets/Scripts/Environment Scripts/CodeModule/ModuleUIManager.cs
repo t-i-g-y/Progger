@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class ModuleUIManager : MonoBehaviour
 {
@@ -10,9 +11,9 @@ public class ModuleUIManager : MonoBehaviour
     private Module currentModule;
     private List<GameObject> instantiatedPalette = new List<GameObject>();
     
-    [SerializeField] private GameObject moduleCanvas;
-    [SerializeField] private Transform paletteParent;
-    [SerializeField] private GameObject draggableObject;
+    [SerializeField] private GameObject _moduleCanvas;
+    [SerializeField] private Transform _paletteParent;
+    [SerializeField] private GameObject _draggableObject;
     
     private void Awake()
     {
@@ -36,17 +37,19 @@ public class ModuleUIManager : MonoBehaviour
 
     public void OpenModuleEditor(Module module)
     {
-        moduleCanvas.SetActive(true);
+        _moduleCanvas.SetActive(true);
         currentModule = module;
         editorOpen = true;
         ClearPalette();
+        module.AssignPointerBlockIDs();
         PopulatePalette(module.AvailableObjects.FindAll(obj => !obj.IsPlaced));
     }
 
     public void CloseModuleEditor()
     {
+        currentModule.ExitModuleMode();
         ClearPalette();
-        moduleCanvas.SetActive(false);
+        _moduleCanvas.SetActive(false);
         editorOpen = false;
     }
 
@@ -54,7 +57,7 @@ public class ModuleUIManager : MonoBehaviour
     {
         foreach (var prefab in prefabs)
         {
-            GameObject uiElement = Instantiate(draggableObject, paletteParent);
+            GameObject uiElement = Instantiate(_draggableObject, _paletteParent);
             ModuleDraggable draggable = uiElement.GetComponent<ModuleDraggable>();
             draggable.Initialize(prefab, currentModule);
             instantiatedPalette.Add(uiElement);

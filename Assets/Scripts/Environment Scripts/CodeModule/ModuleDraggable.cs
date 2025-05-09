@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
+using TMPro;
 
 public class ModuleDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
@@ -13,9 +15,11 @@ public class ModuleDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     private Canvas canvas;
     private Image image;
     private Vector2 originalPosition;
-    [SerializeField] private float gridSize = 0.16f;
-    [SerializeField] private Color validColor = Color.green;
-    [SerializeField] private Color invalidColor = Color.red;
+    [SerializeField] private float _gridSize = 0.16f;
+    [SerializeField] private Color _validColor = Color.green;
+    [SerializeField] private Color _invalidColor = Color.red;
+    [SerializeField] private TMP_Text _upperText;
+    [SerializeField] private TMP_Text _lowerText;
 
     private void Awake()
     {
@@ -30,6 +34,17 @@ public class ModuleDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         canvas = GetComponentInParent<Canvas>();
         Sprite prefabSprite;
 
+        if (currentObject.IsPointer)
+        {
+            _upperText.text = currentObject.TargetID.ToString();
+            _lowerText.text = currentObject.SourceID.ToString();
+        }
+        else
+        {
+            _upperText.text = String.Empty;
+            _lowerText.text = String.Empty;
+        }
+        
         if (currentObject.IsMultipart)
         {
             prefabSprite = currentObject.Prefab.transform.GetChild(0).GetComponent<SpriteRenderer>()?.sprite;
@@ -71,7 +86,7 @@ public class ModuleDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
         if (image != null)
         {
-            image.color = isValid ? validColor : invalidColor;
+            image.color = isValid ? _validColor : _invalidColor;
         }
     }
 
@@ -84,9 +99,18 @@ public class ModuleDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         {
             if (area.IsInside(worldPosition))
             {
-                Vector2 snappedPosition = SnapToGrid(worldPosition, gridSize);
+                Vector2 snappedPosition = SnapToGrid(worldPosition, _gridSize);
                 GameObject placed = Instantiate(currentObject.Prefab, snappedPosition, Quaternion.identity, currentModule.PlacedObjectsParent);
                 currentObject.IsPlaced = true;
+                if (currentObject.IsPointer)
+                {
+                    PointerBlock pointerBlock = placed.GetComponent<PointerBlock>();
+                    if (pointerBlock != null)
+                    {
+                        pointerBlock.Initialize(currentObject.SourceID, currentObject.TargetID, currentModule);
+                        currentModule.PointerBlocks.Add(pointerBlock);
+                    }
+                }
                 if (currentObject.IsMultipart)
                 {
                     SetupMultipartChildren(placed);
@@ -106,7 +130,7 @@ public class ModuleDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         for (int i = 1; i < root.childCount; i++)
         {
             GameObject child = root.GetChild(i).gameObject;
-            child.AddComponent<ModuleChildDraggable>().Initialize(currentModule, gridSize, validColor, invalidColor);
+            child.AddComponent<ModuleChildDraggable>().Initialize(currentModule, _gridSize, _validColor, _invalidColor);
         }
     }
     
