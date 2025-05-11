@@ -7,14 +7,21 @@ using TMPro;
 public class PointerBlock : MonoBehaviour
 {
     private Module module;
-    private bool isActivated;
-    
+    private SpriteRenderer spriteRenderer;
+    [SerializeField] private bool _isActivated;
     [SerializeField] private int _sourceID;
     [SerializeField] private int _targetID;
     [SerializeField] private TMP_Text _targetText;
     [SerializeField] private TMP_Text _sourceText;
     [SerializeField] private float _bounceForce;
+    [SerializeField] private Color _deactivatedColor = Color.white;
+    [SerializeField] private Color _activatedColor = Color.gray;
 
+    private void Awake()
+    {
+        spriteRenderer = GetComponent<SpriteRenderer>();
+    }
+    
     public int SourceID
     {
         get => _sourceID;
@@ -26,6 +33,8 @@ public class PointerBlock : MonoBehaviour
         get => _targetID;
         set => _targetID = value;
     }
+    
+    public float BounceForce => _bounceForce;
     
     public void Initialize(int source, int target, Module module)
     {
@@ -39,26 +48,27 @@ public class PointerBlock : MonoBehaviour
             _targetText.text = target.ToString();
     }
     
-    private void HandlePlayerBounce(GameObject player)
+    public bool TryUsePointerBlock()
     {
-        Rigidbody2D playerBody = player.GetComponent<Rigidbody2D>();
-        playerBody.velocity = new Vector2(playerBody.velocity.x, 0f);
-        playerBody.AddForce(Vector2.up * _bounceForce, ForceMode2D.Impulse);
-    }
-    private void OnTriggerStay2D(Collider2D other)
-    {
-        if (isActivated)
-            return;
-        
-        if (other.CompareTag(TagManager.PLAYER_TAG))
+        if (module.CanChainBounce(this))
         {
-            if (Input.GetButtonDown(TagManager.JUMP_BUTTON) && module.CanChainBounce(this))
-            {
-                Debug.Log("Bounced");
-                isActivated = true;
-                HandlePlayerBounce(other.gameObject);
-            }
+            ActivatePointerBlock();
+            return true;
         }
+        
+        return false;
+    }
+
+    private void ActivatePointerBlock()
+    {
+        _isActivated = true;
+        spriteRenderer.color = _activatedColor;
+    }
+
+    public void DeactivatePointerBlock()
+    {
+        _isActivated = false;
+        spriteRenderer.color = _deactivatedColor;
     }
 }
 

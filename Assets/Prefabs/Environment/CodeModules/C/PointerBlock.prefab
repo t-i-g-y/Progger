@@ -186,7 +186,7 @@ GameObject:
   - component: {fileID: 6492355529427241854}
   m_Layer: 0
   m_Name: PointerBlock
-  m_TagString: Untagged
+  m_TagString: PointerBlock
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -296,7 +296,7 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0, y: 0.03213501}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -307,7 +307,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 1, y: 0.93573}
   m_EdgeRadius: 0
 --- !u!114 &8399551478229210682
 MonoBehaviour:
@@ -321,11 +321,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5192aa2c1f56b44ea80418f3011af2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _isActivated: 0
   _sourceID: 0
   _targetID: 0
   _targetText: {fileID: 8841999080285807850}
   _sourceText: {fileID: 4137231220295750003}
   _bounceForce: 12
+  _deactivatedColor: {r: 1, g: 1, b: 1, a: 1}
+  _activatedColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
 --- !u!222 &6492355529427241854
 CanvasRenderer:
   m_ObjectHideFlags: 0

@@ -13,6 +13,7 @@ TagManager:
   - Platform
   - Climbable
   - ComponentItem
+  - PointerBlock
   layers:
   - Default
   - TransparentFX

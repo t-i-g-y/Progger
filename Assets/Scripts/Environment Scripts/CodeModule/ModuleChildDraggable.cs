@@ -6,17 +6,15 @@ using UnityEngine.EventSystems;
 public class ModuleChildDraggable : MonoBehaviour
 {
     private Module currentModule;
-    private float gridSize;
     private Color validColor;
     private Color invalidColor;
     private Vector2 originalPosition;
     private SpriteRenderer spriteRenderer;
     private bool isDragging;
 
-    public void Initialize(Module module, float gridSize, Color validColor, Color invalidColor)
+    public void Initialize(Module module, Color validColor, Color invalidColor)
     {
         currentModule = module;
-        this.gridSize = gridSize;
         this.validColor = validColor;
         this.invalidColor = invalidColor;
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -24,6 +22,9 @@ public class ModuleChildDraggable : MonoBehaviour
 
     private void Update()
     {
+        if (!ModuleUIManager.Instance.EditorOpen)
+            return;
+        
         if (Input.GetMouseButtonDown(0))
         {
             Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -32,20 +33,23 @@ public class ModuleChildDraggable : MonoBehaviour
             {
                 isDragging = true;
                 originalPosition = transform.position;
+                ModuleUIManager.Instance.GridHighlight.SetActive(true);
             }
         }
-
+        
         if (isDragging)
         {
             Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             transform.position = mouseWorldPos;
-
+            Vector3 snappedPosition = ModuleUIManager.Instance.SnapToGrid(transform.position);
             bool isValid = false;
             foreach (var area in currentModule.AvailableAreas)
             {
                 if (area.IsInside(transform.position))
                 {
                     isValid = true;
+                    ModuleUIManager.Instance.GridHighlight.transform.position = snappedPosition;
+                    ModuleUIManager.Instance.GridHighlight.SetActive(true);
                     break;
                 }
             }
@@ -65,10 +69,10 @@ public class ModuleChildDraggable : MonoBehaviour
                     break;
                 }
             }
-
+            ModuleUIManager.Instance.GridHighlight.SetActive(false);
             if (isValid)
             {
-                transform.position = SnapToGrid(transform.position, gridSize);
+                transform.position = ModuleUIManager.Instance.SnapToGrid(transform.position);
             }
             else
             {
@@ -80,13 +84,6 @@ public class ModuleChildDraggable : MonoBehaviour
 
             isDragging = false;
         }
-    }
-    
-    private Vector2 SnapToGrid(Vector2 position, float gridSize)
-    {
-        float x = Mathf.Round(position.x / gridSize) * gridSize;
-        float y = Mathf.Round(position.y / gridSize) * gridSize;
-        return new Vector2(x, y);
     }
     
 }

@@ -16,11 +16,11 @@ public class ModuleCodeableArea : MonoBehaviour
             spawnedPrefab = Instantiate(codeableAreaPrefab, transform);
             spawnedPrefab.transform.localPosition = Vector3.zero;
             spawnedPrefab.transform.localScale = new Vector3(areaBounds.width, areaBounds.height, 1f);
-            spawnedPrefab.SetActive(false);
+            //spawnedPrefab.SetActive(false);
         }
     }
 
-    public bool IsInside(Vector2 position)
+    public bool IsInside(Vector3 position)
     {
         Vector2 center = transform.position;
         Rect relativeRect = new Rect(center - areaBounds.size / 2f, areaBounds.size);

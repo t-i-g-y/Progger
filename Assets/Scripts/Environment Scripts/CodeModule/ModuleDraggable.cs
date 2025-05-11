@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
@@ -15,7 +16,6 @@ public class ModuleDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     private Canvas canvas;
     private Image image;
     private Vector2 originalPosition;
-    [SerializeField] private float _gridSize = 0.16f;
     [SerializeField] private Color _validColor = Color.green;
     [SerializeField] private Color _invalidColor = Color.red;
     [SerializeField] private TMP_Text _upperText;
@@ -64,7 +64,6 @@ public class ModuleDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        originalPosition = rectTransform.anchoredPosition;
         transform.SetParent(canvas.transform, false);
         transform.SetAsLastSibling();
     }
@@ -73,13 +72,17 @@ public class ModuleDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     {
         rectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor;
         
-        Vector2 worldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector3 worldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector3 snappedPosition = ModuleUIManager.Instance.SnapToGrid(worldPosition);
         bool isValid = false;
         foreach (var area in currentModule.AvailableAreas)
         {
-            if (area.IsInside(worldPosition))
+            ModuleUIManager.Instance.GridHighlight.SetActive(false);
+            if (area.IsInside(worldPosition) && !currentModule.OccupiedTiles.Contains(snappedPosition))
             {
                 isValid = true;
+                ModuleUIManager.Instance.GridHighlight.transform.position = snappedPosition;
+                ModuleUIManager.Instance.GridHighlight.SetActive(true);
                 break;
             }
         }
@@ -92,14 +95,14 @@ public class ModuleDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, I
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        Vector2 worldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        //bool placed = false;
+        Vector3 worldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         
         foreach (var area in currentModule.AvailableAreas)
         {
-            if (area.IsInside(worldPosition))
+            Vector3 snappedPosition = ModuleUIManager.Instance.SnapToGrid(worldPosition);
+            if (area.IsInside(worldPosition) && !currentModule.OccupiedTiles.Contains(snappedPosition))
             {
-                Vector2 snappedPosition = SnapToGrid(worldPosition, _gridSize);
+                currentModule.OccupiedTiles.Add(snappedPosition);
                 GameObject placed = Instantiate(currentObject.Prefab, snappedPosition, Quaternion.identity, currentModule.PlacedObjectsParent);
                 currentObject.IsPlaced = true;
                 if (currentObject.IsPointer)
@@ -115,12 +118,12 @@ public class ModuleDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, I
                 {
                     SetupMultipartChildren(placed);
                 }
+                ModuleUIManager.Instance.GridHighlight.SetActive(false);
                 Destroy(gameObject);
                 return;
             }
         }
-        
-        rectTransform.anchoredPosition = originalPosition;
+        transform.SetParent(ModuleUIManager.Instance.PaletteParent, false);
         GetComponent<Image>().color = Color.white;
     }
 
@@ -130,14 +133,7 @@ public class ModuleDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         for (int i = 1; i < root.childCount; i++)
         {
             GameObject child = root.GetChild(i).gameObject;
-            child.AddComponent<ModuleChildDraggable>().Initialize(currentModule, _gridSize, _validColor, _invalidColor);
+            child.AddComponent<ModuleChildDraggable>().Initialize(currentModule, _validColor, _invalidColor);
         }
-    }
-    
-    private Vector2 SnapToGrid(Vector2 position, float gridSize)
-    {
-        float x = Mathf.Round(position.x / gridSize) * gridSize;
-        float y = Mathf.Round(position.y / gridSize) * gridSize;
-        return new Vector2(x, y);
     }
 }

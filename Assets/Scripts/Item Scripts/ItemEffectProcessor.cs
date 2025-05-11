@@ -20,10 +20,10 @@ public static class ItemEffectProcessor
         {
             case ItemEffectType.Heal:
                 PlayerHealth health = player.GetComponent<PlayerHealth>();
-                float previousHealth = health.Health;
+                float previousHealth = health.TotalHealth;
                 float hp = item.EffectValue;
                 health.Heal(hp);
-                Debug.Log($"Healed by {health.Health - previousHealth}");
+                Debug.Log($"Healed by {health.TotalHealth - previousHealth}");
                 break;
             case ItemEffectType.SpeedBoost:
                 var speedMovement = player.GetComponent<PlayerMovement>();

@@ -14,14 +14,18 @@ public class Module : MonoBehaviour
     [SerializeField] private List<ModuleObject> _availableObjects;
     [SerializeField] private List<ModuleCodeableArea> _availableAreas;
     [SerializeField] private float _panTime = 0.5f;
+    private HashSet<Vector3> occupiedTiles = new HashSet<Vector3>();
     private List<PointerBlock> pointerBlocks = new List<PointerBlock>();
-    private PointerBlock firstPointerBlock;
-    private int currentTargetID;
+    [SerializeField] private int currentTargetID;
+    private int firstPointerBlockSourceID;
+    private int lastPointerBlockSourceID;
+    private float lastBounceTimer;
+    [SerializeField] private float pointerChainResetTimer = 10f;
     
     private Camera mainCamera;
     private CameraFollow mainCameraFollow;
     private float originalCameraZoom;
-
+    
     public Transform PlacedObjectsParent
     {
         get => _placedObjectsParent;
@@ -35,19 +39,33 @@ public class Module : MonoBehaviour
     public List<ModuleCodeableArea> AvailableAreas
     {
         get => _availableAreas;
+        set => _availableAreas = value;
     }
 
+    public HashSet<Vector3> OccupiedTiles
+    {
+        get => occupiedTiles;
+        set => occupiedTiles = value;
+    }
+    
     public List<PointerBlock> PointerBlocks
     {
         get => pointerBlocks;
         set => pointerBlocks = value;
     }
     
+    public int FirstPointerBlockSourceID => firstPointerBlockSourceID;
+    public int LastPointerBlockSourceID => lastPointerBlockSourceID;
     private void Awake()
     {
         mainCamera = Camera.main;
         mainCameraFollow = mainCamera.GetComponent<CameraFollow>();
         currentTargetID = -1;
+        
+        foreach (var area in _availableAreas)
+        {
+            area.HideCodeableArea();
+        }
     }
 
     public void EnterModuleMode()
@@ -134,6 +152,9 @@ public class Module : MonoBehaviour
             futurePointerBlocks[i].SourceID = idList[i];
             futurePointerBlocks[i].TargetID = idList[i + 1];
         }
+
+        firstPointerBlockSourceID = futurePointerBlocks[0].SourceID;
+        lastPointerBlockSourceID = futurePointerBlocks[^1].SourceID;
         ShuffleList(futurePointerBlocks);
         _availableObjects.AddRange(futurePointerBlocks);
     }
@@ -149,17 +170,41 @@ public class Module : MonoBehaviour
 
     public bool CanChainBounce(PointerBlock pointer) 
     {
-        if (currentTargetID == -1)
+        Debug.Log($"{currentTargetID} -> {pointer.TargetID}");
+
+        if (pointer.SourceID == firstPointerBlockSourceID)
         {
-            currentTargetID = pointer.TargetID;
+            ResetPointerBlocks();
             return true;
         }
-        if (currentTargetID == pointer.SourceID)
+        
+        if (currentTargetID == -1 || currentTargetID == pointer.SourceID)
         {
+            if (pointer.SourceID == lastPointerBlockSourceID)
+            {
+                StartCoroutine(PointerBlockResetCoroutine(3f));
+            }
             currentTargetID = pointer.TargetID;
+            
             return true;
         }
+        //FailSoundEffect
         return false;
+    }
+
+    private IEnumerator PointerBlockResetCoroutine(float time)
+    {
+        yield return new WaitForSeconds(time);
+        ResetPointerBlocks();
+    }
+    
+    public void ResetPointerBlocks()
+    {
+        foreach (var pointerBlock in pointerBlocks)
+        {
+            pointerBlock.DeactivatePointerBlock();
+        }
+        currentTargetID = -1;
     }
 }
 

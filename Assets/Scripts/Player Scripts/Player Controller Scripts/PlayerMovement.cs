@@ -39,7 +39,8 @@ public class PlayerMovement : MonoBehaviour
     
     [Header("Ground Check")]
     [SerializeField] private LayerMask _groundMask;
-    private RaycastHit2D groundCast;
+    [SerializeField] private Transform _groundCheck;
+    [SerializeField] private Vector2 _groundCheckSize = new Vector2(0.5f, 0.1f);
     
     [Header("Dropping")] 
     [SerializeField] private float _dropTime = 0.25f;
@@ -78,8 +79,10 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float _topCheckRadius = 0.1f;
     private bool canClimb;
     private bool isClimbing;
+
+    private bool canPointerBounce;
+    private PointerBlock pointerBlock;
     
-    //[Header("Debugging")]
     private float jumpPressTimestamp;
     private float jumpExecutionTimestamp;
 
@@ -147,8 +150,13 @@ public class PlayerMovement : MonoBehaviour
             return;
         if (isDashing)
             return;
+        if (canPointerBounce)
+        {
+            HandlePointerBlockBounce();
+        }
         HandleClimbing();
-        HandleJumping();
+        if (!isClimbing)
+            HandleJumping();
         HandleGravity();
         if (AbilityManager.Instance.AbilityUnlocked(ProgrammingLanguage.Python))
         {
@@ -235,8 +243,7 @@ public class PlayerMovement : MonoBehaviour
             Jump();
         }
 
-        if (!IsGrounded() && Input.GetKeyDown(KeyCode.Space) && jumped && jumpsRemaining > 0 
-            && AbilityManager.Instance.AbilityUnlocked(ProgrammingLanguage.CPlusPlus))
+        if (!IsGrounded() && Input.GetKeyDown(KeyCode.Space) && jumped && jumpsRemaining > 0 && AbilityManager.Instance.AbilityUnlocked(ProgrammingLanguage.CPlusPlus))
         {
             jumpForce = _doubleJumpForce;
             Jump();
@@ -306,16 +313,27 @@ public class PlayerMovement : MonoBehaviour
     
     private bool IsGrounded()
     {
-        groundCast = Physics2D.BoxCast(playerCollider.bounds.center, playerCollider.bounds.size, 0f, Vector2.down, 0.1f,
-            _groundMask);
-        //Debug.DrawRay(boxCol2D.bounds.center + new Vector3(boxCol2D.bounds.extents.x, 0f), Vector2.down * (boxCol2D.bounds.extents.y + 0.01f), Color.red);
-        //Debug.DrawRay(boxCol2D.bounds.center - new Vector3(boxCol2D.bounds.extents.x, 0f), Vector2.down * (boxCol2D.bounds.extents.y + 0.01f), Color.red);
-        //Debug.DrawRay(boxCol2D.bounds.center - new Vector3(boxCol2D.bounds.extents.x, boxCol2D.bounds.extents.y + 0.01f), Vector2.right * boxCol2D.bounds.size.x, Color.red);
-        return groundCast.collider != null;
+        Collider2D[] collisions = Physics2D.OverlapBoxAll(_groundCheck.position, _groundCheckSize, 0f, _groundMask);
+        foreach (Collider2D collision in collisions)
+        {
+            if (collision.CompareTag(TagManager.PLATFORM_TAG))
+            {
+                isOnPlatform = true;
+            }
+            else
+            {
+                isOnPlatform = false;
+            }
+
+            return true;
+        }
+
+        return false;
     }
     
     private void HandleDrop()
     {
+        //Debug.Log($"IsGrounded: {IsGrounded()}; IsOnPlatform: {isOnPlatform}");
         if (Input.GetKeyDown(KeyCode.S) && IsGrounded() && isOnPlatform)
         {
             StartCoroutine(DropCoroutine());
@@ -326,6 +344,12 @@ public class PlayerMovement : MonoBehaviour
         playerCollider.enabled = false;
         yield return new WaitForSeconds(_dropTime);
         playerCollider.enabled = true;
+    }
+
+    private bool IsOnPlatform()
+    {
+        Collider2D hit = Physics2D.OverlapBox(_groundCheck.position, _groundCheckSize, 0f);
+        return hit != null && hit.CompareTag(TagManager.PLATFORM_TAG);
     }
     
     private void HandleGravity()
@@ -437,7 +461,6 @@ public class PlayerMovement : MonoBehaviour
 
     private void HandleClimbing()
     {
-        
         if (canClimb && (Input.GetButton(TagManager.JUMP_BUTTON) || Input.GetKey(KeyCode.W)))
         {
             playerBody.velocity = new Vector2(playerBody.velocity.x, _climbSpeed);
@@ -458,21 +481,25 @@ public class PlayerMovement : MonoBehaviour
             isClimbing = false;
         }
     }
-    
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.gameObject.CompareTag(TagManager.PLATFORM_TAG))
-        {
-            isOnPlatform = true;
-            Debug.Log("is on platform");
-        }
-    }
 
-    private void OnCollisionExit2D(Collision2D collision)
+    private void HandlePointerBlockBounce()
     {
-        if (collision.gameObject.CompareTag(TagManager.PLATFORM_TAG))
+        if (pointerBlock == null)
+            return;
+
+        if (Input.GetButton(TagManager.JUMP_BUTTON))
         {
-            isOnPlatform = false;
+            float originalJumpForce = jumpForce;
+            float originalMultiplier = jumpMultiplier;
+            bool isUsablePointer = pointerBlock.TryUsePointerBlock();
+            if (isUsablePointer)
+            {
+                jumpForce = pointerBlock.BounceForce;
+                jumpMultiplier = 1f;
+                Jump();
+            }
+            jumpForce = originalJumpForce;
+            jumpMultiplier = originalMultiplier;
         }
     }
 
@@ -483,6 +510,14 @@ public class PlayerMovement : MonoBehaviour
             canClimb = true;
             Debug.Log("Can climb");
         }
+
+        if (other.gameObject.CompareTag(TagManager.POINTER_BLOCK_TAG))
+        {
+            canPointerBounce = true;
+            Debug.Log($"On Pointer block {canPointerBounce}");
+            pointerBlock = other.gameObject.GetComponent<PointerBlock>();
+            Debug.Log($"Pointer block {pointerBlock != null}");
+        }
     }
 
     private void OnTriggerExit2D(Collider2D other)
@@ -491,6 +526,14 @@ public class PlayerMovement : MonoBehaviour
         {
             canClimb = false;
             Debug.Log("Cannot climb");
+        }
+        
+        if (other.gameObject.CompareTag(TagManager.POINTER_BLOCK_TAG))
+        {
+            canPointerBounce = false;
+            Debug.Log($"On Pointer block {canPointerBounce}");
+            pointerBlock = null;
+            Debug.Log($"Pointer block {pointerBlock != null}");
         }
     }
 }
