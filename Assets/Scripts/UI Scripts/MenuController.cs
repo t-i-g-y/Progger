@@ -2,15 +2,16 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class MenuController : MonoBehaviour
 {
-    [SerializeField] private GameObject menuCanvas;
-    [SerializeField] private GameObject singleSlotUI;
+    [SerializeField] private GameObject _menuCanvas;
+    [SerializeField] private GameObject _singleSlotUI;
     [SerializeField] private TabController _tabController;
     private void Start()
     {
-        menuCanvas.SetActive(false);
+        _menuCanvas.SetActive(false);
     }
 
     private void Update()
@@ -18,10 +19,10 @@ public class MenuController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Tab)) 
         {
             _tabController.RefreshTab();
-            bool newState = !menuCanvas.activeSelf;
-            menuCanvas.SetActive(!menuCanvas.activeSelf);
-            Time.timeScale = menuCanvas.activeSelf ? 0f : 1f;
-            singleSlotUI.SetActive(!newState);
+            bool newState = !_menuCanvas.activeSelf;
+            _menuCanvas.SetActive(!_menuCanvas.activeSelf);
+            Time.timeScale = _menuCanvas.activeSelf ? 0f : 1f;
+            _singleSlotUI.SetActive(!newState);
         }
     }
 }

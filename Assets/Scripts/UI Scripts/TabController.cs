@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 public class TabController : MonoBehaviour
 {
-    [SerializeField] private Image[] tabImages;
-    public GameObject[] pages;
+    [SerializeField] private Image[] _tabImages;
+    [SerializeField] private GameObject[] _pages;
     private bool CSharpAlreadyUnlocked;
     private bool SQLAlreadyUnlocked;
     private int lastTab;
@@ -16,25 +17,25 @@ public class TabController : MonoBehaviour
 
     public void ActivateTab(int tab)
     {
-        for (int i = 0; i < pages.Length; i++)
+        for (int i = 0; i < _pages.Length; i++)
         {
-            pages[i].SetActive(false);
-            tabImages[i].color = Color.grey;
+            _pages[i].SetActive(false);
+            _tabImages[i].color = Color.grey;
         }
 
         if (!CSharpAlreadyUnlocked && tab == (int)MenuPages.Player && AbilityManager.Instance.AbilityUnlocked(ProgrammingLanguage.CSharp))
         {
-            pages[tab].transform.GetChild(0).gameObject.SetActive(true);
+            _pages[tab].transform.GetChild(0).gameObject.SetActive(true);
             UpgradeComponentManager.Instance.BuildComponentList();
             CSharpAlreadyUnlocked = true;
         }
         else if (!SQLAlreadyUnlocked && tab == (int)MenuPages.Inventory && AbilityManager.Instance.AbilityUnlocked(ProgrammingLanguage.SQL))
         {
-            pages[tab].transform.GetChild(0).gameObject.SetActive(true);
+            _pages[tab].transform.GetChild(0).gameObject.SetActive(true);
             SQLAlreadyUnlocked = true;
         }
-        pages[tab].SetActive(true);
-        tabImages[tab].color = Color.white;
+        _pages[tab].SetActive(true);
+        _tabImages[tab].color = Color.white;
         lastTab = tab;
     }
 

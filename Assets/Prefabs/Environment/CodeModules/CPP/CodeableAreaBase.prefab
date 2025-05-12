@@ -44,10 +44,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 914cee4c1c5ca0e45894e49798260876, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  areaBounds:
+  _areaBounds:
     serializedVersion: 2
     x: 0
     y: 0
-    width: 3
-    height: 3
-  codeableAreaPrefab: {fileID: 7036701954716158520, guid: 8eedd84fa8e770c49b5e994d1ea8ff88, type: 3}
+    width: 0
+    height: 0
+  _codeableAreaPrefab: {fileID: 7036701954716158520, guid: 8eedd84fa8e770c49b5e994d1ea8ff88, type: 3}

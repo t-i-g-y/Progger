@@ -21,19 +21,10 @@ public class UpgradeSlot : MonoBehaviour, IDropHandler
         
         if (outgoing != null)
         {
-            //ClearSlot();
             UpgradeComponentManager.Instance.UnassignComponent(outgoing.ComponentData);
             UpgradeComponentManager.Instance.ReturnToComponentList(outgoing);
         }
     }
-
-    public void ClearSlot()
-    {
-        UpgradeComponentManager.Instance.UnassignComponent(currentUpgrade.ComponentData);
-        UpgradeComponentManager.Instance.ReturnToComponentList(currentUpgrade);
-        currentUpgrade = null;
-    }
-
 }
 
 

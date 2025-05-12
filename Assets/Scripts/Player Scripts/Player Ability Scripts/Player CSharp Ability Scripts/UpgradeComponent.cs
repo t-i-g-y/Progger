@@ -19,12 +19,12 @@ public class UpgradeComponent : MonoBehaviour, IBeginDragHandler, IDragHandler, 
     private CanvasGroup canvasGroup;
     private RectTransform rectTransform;
     private Transform originalParent;
-    private UpgradeComponentData _data;
+    private UpgradeComponentData data;
     private bool wasInSlot;
     public UpgradeComponentData ComponentData
     {
-        get => _data; 
-        set => _data = value;
+        get => data; 
+        set => data = value;
     }
     
     public bool WasInSlot => wasInSlot;
@@ -36,7 +36,7 @@ public class UpgradeComponent : MonoBehaviour, IBeginDragHandler, IDragHandler, 
 
     public void Initialize(UpgradeComponentData data)
     {
-        _data = data;
+        this.data = data;
         GetComponentInChildren<TMP_Text>().text = GetLabelText();
     }
 
@@ -66,19 +66,13 @@ public class UpgradeComponent : MonoBehaviour, IBeginDragHandler, IDragHandler, 
         
         if (transform.parent == transform.root)
         {
-            if (originalParent.TryGetComponent(out UpgradeSlot slot))
-            {
-                //slot.ClearSlot();
-                
-            }
-
             UpgradeComponentManager.Instance.ReturnToComponentList(this);
         }
     }
 
     private string GetLabelText()
     {
-        switch (_data.type)
+        switch (data.type)
         {
             case UpgradeType.MaxJump:
                 return "+1 Max Jump";

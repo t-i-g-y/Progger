@@ -80,7 +80,8 @@ public class ModuleDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, I
             {
                 if (currentModule.TryGetPlacedObject(snappedPosition, out GameObject obj))
                 {
-                    if (obj.GetComponent<ICSharpModifiable>() != null)
+                    ICSharpModifiable modifiable = obj.GetComponent<ICSharpModifiable>();
+                    if (modifiable != null && !modifiable.HasModuleComponent())
                     {
                         isValid = true;
                         ModuleUIManager.Instance.GridHighlight.transform.position = snappedPosition;
@@ -117,9 +118,9 @@ public class ModuleDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, I
             {
                 Debug.Log("Got placed object");
                 ICSharpModifiable modifiable = placedObject.GetComponent<ICSharpModifiable>();
-                if (modifiable != null)
+                if (modifiable != null && !modifiable.HasModuleComponent())
                 {
-                    Debug.Log("Got modifiable");
+                    Debug.Log("Got free modifiable");
                     GameObject placed = Instantiate(currentObject.Prefab, snappedPosition, Quaternion.identity, placedObject.transform);
                     placed.AddComponent<ModuleObjectComponent>().Initialize(currentObject.ComponentType, snappedPosition, placedObject);
                     currentObject.IsPlaced = true;

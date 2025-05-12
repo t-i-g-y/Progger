@@ -8,6 +8,7 @@ public class HeaderBlock : MonoBehaviour, ICSharpModifiable
     [SerializeField] private GameObject _codeableAreaPrefab;
     private GameObject instantiatedArea;
     private ModuleCodeableArea codeableArea;
+    private ModuleObjectComponentType activeComponent = ModuleObjectComponentType.None;
     
     private void Start()
     {
@@ -19,7 +20,6 @@ public class HeaderBlock : MonoBehaviour, ICSharpModifiable
         instantiatedArea = Instantiate(_codeableAreaPrefab, transform.position, Quaternion.identity, transform);
         codeableArea = instantiatedArea.GetComponent<ModuleCodeableArea>();
         ModuleUIManager.Instance.CurrentModule.AvailableAreas.Add(codeableArea);
-        //codeableArea.ShowCodeableArea();
     }
 
     private void OnDestroy()
@@ -35,11 +35,21 @@ public class HeaderBlock : MonoBehaviour, ICSharpModifiable
     
     public void ApplyModuleComponent(ModuleObjectComponentType componentType)
     {
-        
+        activeComponent = componentType;
     }
 
     public void RemoveModuleComponent(ModuleObjectComponentType componentType)
     {
-        
+        activeComponent = ModuleObjectComponentType.None;
+    }
+
+    public bool HasModuleComponent()
+    {
+        return activeComponent != ModuleObjectComponentType.None;
+    }
+    
+    public ModuleObjectComponentType GetModuleComponentType()
+    {
+        return activeComponent;
     }
 }

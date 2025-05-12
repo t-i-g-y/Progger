@@ -10,6 +10,7 @@ public class FallingPlatform : MonoBehaviour, ICSharpModifiable
     [SerializeField] private float _destroyTime = 1f;
     private bool isFalling;
     private Rigidbody2D rb;
+    private ModuleObjectComponentType activeComponent = ModuleObjectComponentType.None;
 
     private void Start()
     {
@@ -35,11 +36,21 @@ public class FallingPlatform : MonoBehaviour, ICSharpModifiable
     
     public void ApplyModuleComponent(ModuleObjectComponentType componentType)
     {
-        
+        activeComponent = componentType;
     }
 
     public void RemoveModuleComponent(ModuleObjectComponentType componentType)
     {
-        
+        activeComponent = ModuleObjectComponentType.None;
+    }
+
+    public bool HasModuleComponent()
+    {
+        return activeComponent != ModuleObjectComponentType.None;
+    }
+    
+    public ModuleObjectComponentType GetModuleComponentType()
+    {
+        return activeComponent;
     }
 }

@@ -24,7 +24,7 @@ public class HorizontalSnakeController : MonoBehaviour
 
     private void HandleMovement()
     {
-        float moveInput = Input.GetAxisRaw("Horizontal");
+        float moveInput = Input.GetAxisRaw(TagManager.HORIZONTAL_MOVEMENT);
         transform.position += new Vector3(moveInput * moveSpeed * Time.deltaTime, 0f, 0f);
     }
 
@@ -32,7 +32,6 @@ public class HorizontalSnakeController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.E))
         {
-            // You can put your trigger interaction logic here later
             Debug.Log("Snake Interacted!");
         }
     }

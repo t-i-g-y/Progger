@@ -15,7 +15,7 @@ public class VerticalSnakeSpawner : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.R) && !isOnCooldown)
+        if (Input.GetKeyDown(KeyCode.R) && !isOnCooldown && !ModuleUIManager.Instance.EditorOpen)
         {
             StartCoroutine(GrowSnake());
         }

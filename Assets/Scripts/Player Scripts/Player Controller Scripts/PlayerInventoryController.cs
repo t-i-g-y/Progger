@@ -275,6 +275,4 @@ public class PlayerInventoryController : MonoBehaviour
             _singleSlotIcon.enabled = false;
         }
     }
-    
-    
 }

@@ -381,8 +381,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _maxHealth: 3
-  _heartSprites: []
-  _heartRenderers: []
+  _healthUI: {fileID: 0}
 --- !u!114 &4114064096521342484
 MonoBehaviour:
   m_ObjectHideFlags: 0

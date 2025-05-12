@@ -4,13 +4,14 @@ using UnityEngine;
 
 public enum ModuleObjectComponentType
 {
+    None,
     Healer,
     Damage,
     Amplifier,
     Nullifier,
     Shield,
     Bounce,
-    Catcher
+    TryCatcher
 }
 
 public class ModuleObjectComponent : MonoBehaviour
@@ -35,11 +36,13 @@ public class ModuleObjectComponent : MonoBehaviour
         targetPosition = position;
         targetObject = objectToModify;
         targetModifiable = targetObject.GetComponent<ICSharpModifiable>();
-
-        if (targetModifiable != null)
+        
+        if (targetModifiable != null && !targetModifiable.HasModuleComponent())
         {
+            Debug.Log("Applied Component");
             targetModifiable.ApplyModuleComponent(componentType);
         }
+        
     }
 
     public void Detach()

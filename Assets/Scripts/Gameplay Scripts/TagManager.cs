@@ -13,7 +13,9 @@ public static class TagManager
     public static string LANGUAGE_TAG = "Language";
     public static string CLIMBABLE_TAG = "Climbable";
     public static string POINTER_BLOCK_TAG = "PointerBlock";
+    public static string ENEMY_TAG = "Enemy";
     
     public static string HORIZONTAL_MOVEMENT = "Horizontal";
+    public static string VERTICAL_MOVEMENT = "Vertical";
     public static string JUMP_BUTTON = "Jump";
 }

@@ -6,4 +6,6 @@ public interface ICSharpModifiable
 {
     void ApplyModuleComponent(ModuleObjectComponentType componentType);
     void RemoveModuleComponent(ModuleObjectComponentType componentType);
+    bool HasModuleComponent();
+    public ModuleObjectComponentType GetModuleComponentType();
 }

@@ -315,9 +315,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f7835bc8eda598148b82faa2e86cf202, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pointA: {fileID: 812828460248589409}
-  pointB: {fileID: 701925977889501111}
-  moveSpeed: 2
+  _pointA: {fileID: 812828460248589409}
+  _pointB: {fileID: 701925977889501111}
+  _moveSpeed: 2
 --- !u!1 &8169308692988892555
 GameObject:
   m_ObjectHideFlags: 0

@@ -13,15 +13,17 @@ public class ModuleConsole : MonoBehaviour
     {
         if (isUsable)
         {
-            if (Input.GetKeyDown(KeyCode.E))
+            bool editorActive = ModuleUIManager.Instance.EditorOpen;
+            if (Input.GetKeyDown(KeyCode.E) && !editorActive)
             {
                 Debug.Log("Console opened");
                 linkedModule.EnterModuleMode();
             }
-            else if (Input.GetKeyDown(KeyCode.Escape))
+            else if (Input.GetKeyDown(KeyCode.Escape) || (editorActive && Input.GetKeyDown(KeyCode.E)))
             {
                 Debug.Log("Console exited");
                 linkedModule.ExitModuleMode();
+                ModuleUIManager.Instance.CloseModuleEditor();
             }
         }
     }

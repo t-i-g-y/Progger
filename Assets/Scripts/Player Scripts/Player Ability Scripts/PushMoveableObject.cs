@@ -3,11 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Vector2 = UnityEngine.Vector2;
 
 public class PushMoveableObject : MonoBehaviour
 {
-    [SerializeField] private float pushForce;
+    [SerializeField] private float _pushForce;
     private bool nearPushableObject;
     private bool isPushing;
     private BoxCollider2D boxCol2D;
@@ -36,7 +37,7 @@ public class PushMoveableObject : MonoBehaviour
                 pushDirection = 1;
             else if (myBody.velocity.x < 0)
                 pushDirection = -1;
-            pushedObject.velocity = new Vector2(pushDirection * pushForce, 0);
+            pushedObject.velocity = new Vector2(pushDirection * _pushForce, 0);
         }
     }
 

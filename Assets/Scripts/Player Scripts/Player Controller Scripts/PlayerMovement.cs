@@ -139,11 +139,6 @@ public class PlayerMovement : MonoBehaviour
         trailRenderer = GetComponent<TrailRenderer>();
     }
 
-    private void Start()
-    {
-        //SpeedItem.OnSpeedCollected += StartSpeedBoost;
-    }
-
     private void Update()
     {
         if (InputBlocked || Time.timeScale == 0f)

@@ -2,12 +2,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class GoToSystem : MonoBehaviour, ICSharpModifiable
 {
-    [SerializeField] private Transform goToMarker;
+    [SerializeField] private Transform _goToMarker;
     private GameObject player;
     private bool canGoTo;
+    private ModuleObjectComponentType activeComponent = ModuleObjectComponentType.None;
 
     private void Start()
     {
@@ -41,16 +43,26 @@ public class GoToSystem : MonoBehaviour, ICSharpModifiable
 
     private void PlayerGoTo()
     {
-        player.transform.position = goToMarker.position;
+        player.transform.position = _goToMarker.position;
     }
     
     public void ApplyModuleComponent(ModuleObjectComponentType componentType)
     {
-        
+        activeComponent = componentType;
     }
 
     public void RemoveModuleComponent(ModuleObjectComponentType componentType)
     {
-        
+        activeComponent = ModuleObjectComponentType.None;
+    }
+
+    public bool HasModuleComponent()
+    {
+        return activeComponent != ModuleObjectComponentType.None;
+    }
+    
+    public ModuleObjectComponentType GetModuleComponentType()
+    {
+        return activeComponent;
     }
 }

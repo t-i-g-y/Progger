@@ -8,6 +8,7 @@ public class PointerBlock : MonoBehaviour, ICSharpModifiable
 {
     private Module module;
     private SpriteRenderer spriteRenderer;
+    private ModuleObjectComponentType activeComponent = ModuleObjectComponentType.None;
     [SerializeField] private bool _isActivated;
     [SerializeField] private int _sourceID;
     [SerializeField] private int _targetID;
@@ -73,12 +74,22 @@ public class PointerBlock : MonoBehaviour, ICSharpModifiable
 
     public void ApplyModuleComponent(ModuleObjectComponentType componentType)
     {
-        
+        activeComponent = componentType;
     }
 
     public void RemoveModuleComponent(ModuleObjectComponentType componentType)
     {
-        
+        activeComponent = ModuleObjectComponentType.None;
+    }
+
+    public bool HasModuleComponent()
+    {
+        return activeComponent != ModuleObjectComponentType.None;
+    }
+    
+    public ModuleObjectComponentType GetModuleComponentType()
+    {
+        return activeComponent;
     }
 }
 

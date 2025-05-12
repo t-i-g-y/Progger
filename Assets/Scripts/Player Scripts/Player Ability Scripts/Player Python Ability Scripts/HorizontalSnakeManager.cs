@@ -5,16 +5,16 @@ using UnityEngine.Serialization;
 
 public class HorizontalSnakeManager : MonoBehaviour
 {
-    [SerializeField] private GameObject snakePrefab;
-    [SerializeField] private Transform player;
-    [SerializeField] private CameraFollow cameraFollow;
+    [SerializeField] private GameObject _snakePrefab;
+    [SerializeField] private Transform _player;
+    [SerializeField] private CameraFollow _cameraFollow;
 
     private HorizontalSnakeController activeSnake;
     private bool controllingSnake;
 
     private void Awake()
     {
-        player = GameObject.FindGameObjectWithTag(TagManager.PLAYER_TAG).transform;
+        _player = GameObject.FindGameObjectWithTag(TagManager.PLAYER_TAG).transform;
     }
     private void Update()
     {
@@ -30,12 +30,12 @@ public class HorizontalSnakeManager : MonoBehaviour
 
     private void SpawnSnake()
     {
-        GameObject snakeObj = Instantiate(snakePrefab, player.position, Quaternion.identity);
+        GameObject snakeObj = Instantiate(_snakePrefab, _player.position, Quaternion.identity);
         activeSnake = snakeObj.GetComponent<HorizontalSnakeController>();
         controllingSnake = true;
 
         PlayerMovement.InputBlocked = true;
-        cameraFollow.SetTarget(snakeObj.transform);
+        _cameraFollow.SetTarget(snakeObj.transform);
     }
 
     public void ReturnToPlayer()
@@ -44,7 +44,7 @@ public class HorizontalSnakeManager : MonoBehaviour
             Destroy(activeSnake.gameObject);
 
         PlayerMovement.InputBlocked = false;
-        cameraFollow.SetTarget(player);
+        _cameraFollow.SetTarget(_player);
         controllingSnake = false;
     }
 }

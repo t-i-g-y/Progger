@@ -2,20 +2,21 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class ModuleCodeableArea : MonoBehaviour
 {
-    [SerializeField] private Rect areaBounds;
-    [SerializeField] private GameObject codeableAreaPrefab;
+    [SerializeField] private Rect _areaBounds;
+    [SerializeField] private GameObject _codeableAreaPrefab;
     private GameObject spawnedPrefab;
     
     private void Start()
     {
-        if (codeableAreaPrefab != null)
+        if (_codeableAreaPrefab != null)
         {
-            spawnedPrefab = Instantiate(codeableAreaPrefab, transform);
+            spawnedPrefab = Instantiate(_codeableAreaPrefab, transform);
             spawnedPrefab.transform.localPosition = Vector3.zero;
-            spawnedPrefab.transform.localScale = new Vector3(areaBounds.width, areaBounds.height, 1f);
+            spawnedPrefab.transform.localScale = new Vector3(_areaBounds.width, _areaBounds.height, 1f);
             //spawnedPrefab.SetActive(false);
         }
     }
@@ -23,7 +24,7 @@ public class ModuleCodeableArea : MonoBehaviour
     public bool IsInside(Vector3 position)
     {
         Vector2 center = transform.position;
-        Rect relativeRect = new Rect(center - areaBounds.size / 2f, areaBounds.size);
+        Rect relativeRect = new Rect(center - _areaBounds.size / 2f, _areaBounds.size);
         return relativeRect.Contains(position);
     }
 
@@ -46,6 +47,6 @@ public class ModuleCodeableArea : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireCube(transform.position, new Vector3(areaBounds.width, areaBounds.height, 0));
+        Gizmos.DrawWireCube(transform.position, new Vector3(_areaBounds.width, _areaBounds.height, 0));
     }
 }

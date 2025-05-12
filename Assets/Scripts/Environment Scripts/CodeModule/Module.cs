@@ -14,14 +14,14 @@ public class Module : MonoBehaviour
     [SerializeField] private List<ModuleObject> _availableObjects;
     [SerializeField] private List<ModuleCodeableArea> _availableAreas;
     [SerializeField] private float _panTime = 0.5f;
-    private Dictionary<Vector3, GameObject> _placedObjects = new Dictionary<Vector3, GameObject>();
+    private Dictionary<Vector3, GameObject> placedObjects = new Dictionary<Vector3, GameObject>();
     private HashSet<Vector3> occupiedTiles = new HashSet<Vector3>();
     private List<PointerBlock> pointerBlocks = new List<PointerBlock>();
-    [SerializeField] private int currentTargetID;
+    private int currentTargetID;
     private int firstPointerBlockSourceID;
     private int lastPointerBlockSourceID;
     private float lastBounceTimer;
-    [SerializeField] private float pointerChainResetTimer = 10f;
+    private float pointerChainResetTimer = 10f;
     
     private Camera mainCamera;
     private CameraFollow mainCameraFollow;
@@ -29,8 +29,8 @@ public class Module : MonoBehaviour
 
     public Dictionary<Vector3, GameObject> PlacedObjects
     {
-        get => _placedObjects;
-        set => _placedObjects = value;
+        get => placedObjects;
+        set => placedObjects = value;
     }
     
     public Transform PlacedObjectsParent
@@ -48,7 +48,7 @@ public class Module : MonoBehaviour
         get => _availableAreas;
         set => _availableAreas = value;
     }
-
+    
     public HashSet<Vector3> OccupiedTiles
     {
         get => occupiedTiles;
@@ -81,7 +81,7 @@ public class Module : MonoBehaviour
         originalCameraZoom = mainCamera.orthographicSize;
         if (mainCameraFollow != null)
         {
-            mainCameraFollow.IsEnabled = false;
+            mainCameraFollow.EnterEditorMode(CalculateModuleBounds());
         }
 
         foreach (var area in _availableAreas)
@@ -98,7 +98,7 @@ public class Module : MonoBehaviour
         Time.timeScale = 1f;
         if (mainCameraFollow != null)
         {
-            mainCameraFollow.IsEnabled = true;
+            mainCameraFollow.ExitEditorMode();
             mainCamera.orthographicSize = originalCameraZoom;
         }
         
@@ -106,8 +106,6 @@ public class Module : MonoBehaviour
         {
             area.HideCodeableArea();
         }
-        
-        //ModuleUIManager.Instance.CloseModuleEditor();
     }
 
     private IEnumerator CameraPanCoroutine()
@@ -124,20 +122,34 @@ public class Module : MonoBehaviour
             yield return null;
         }
     }
+    
+    private Rect CalculateModuleBounds()
+    {
+        if (_availableAreas == null || _availableAreas.Count == 0)
+            return new Rect(_cameraFocus.x - 5, _cameraFocus.y - 5, 10, 10);
+
+        Bounds bounds = new Bounds(_availableAreas[0].transform.position, Vector3.zero);
+        foreach (var area in _availableAreas)
+        {
+            bounds.Encapsulate(area.transform.position);
+        }
+        float padding = 2f;
+        return new Rect(bounds.min.x - padding, bounds.min.y - padding, bounds.size.x + padding * 2, bounds.size.y + padding * 2);
+    }
 
     public bool TryGetPlacedObject(Vector3 position, out GameObject placedObject)
     {
-        return _placedObjects.TryGetValue(position, out placedObject);
+        return placedObjects.TryGetValue(position, out placedObject);
     }
     
     public void RegisterPlacedObject(Vector3 position, GameObject placedObject)
     {
-        _placedObjects[position] = placedObject;
+        placedObjects[position] = placedObject;
     }
 
     public void RemovePlacedObject(Vector3 position)
     {
-        _placedObjects.Remove(position);
+        placedObjects.Remove(position);
     }
     public void AssignPointerBlockIDs()
     {

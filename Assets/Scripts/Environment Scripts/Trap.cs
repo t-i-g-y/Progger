@@ -7,6 +7,7 @@ public class Trap : MonoBehaviour, ICSharpModifiable
 {
     [SerializeField] private float _bounceForce;
     [SerializeField] private float _trapDamage;
+    private ModuleObjectComponentType activeComponent = ModuleObjectComponentType.None;
     
     private void HandlePlayerBounce(GameObject player)
     {
@@ -30,11 +31,21 @@ public class Trap : MonoBehaviour, ICSharpModifiable
     
     public void ApplyModuleComponent(ModuleObjectComponentType componentType)
     {
-        
+        activeComponent = componentType;
     }
 
     public void RemoveModuleComponent(ModuleObjectComponentType componentType)
     {
-        
+        activeComponent = ModuleObjectComponentType.None;
+    }
+
+    public bool HasModuleComponent()
+    {
+        return activeComponent != ModuleObjectComponentType.None;
+    }
+    
+    public ModuleObjectComponentType GetModuleComponentType()
+    {
+        return activeComponent;
     }
 }
