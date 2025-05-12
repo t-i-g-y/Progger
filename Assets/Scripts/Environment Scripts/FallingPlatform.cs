@@ -2,11 +2,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
-public class FallingPlatform : MonoBehaviour
+public class FallingPlatform : MonoBehaviour, ICSharpModifiable
 {
-    [SerializeField] private float fallWait = 2f;
-    [SerializeField] private float destroyTime = 1f;
+    [SerializeField] private float _fallWait = 2f;
+    [SerializeField] private float _destroyTime = 1f;
     private bool isFalling;
     private Rigidbody2D rb;
 
@@ -26,9 +27,19 @@ public class FallingPlatform : MonoBehaviour
     private IEnumerator FallingPlatformCoroutine()
     {
         isFalling = true;
-        yield return new WaitForSeconds(fallWait);
+        yield return new WaitForSeconds(_fallWait);
         rb.bodyType = RigidbodyType2D.Dynamic;
         rb.constraints = RigidbodyConstraints2D.FreezeRotation;
-        Destroy(gameObject, destroyTime);
+        Destroy(gameObject, _destroyTime);
+    }
+    
+    public void ApplyModuleComponent(ModuleObjectComponentType componentType)
+    {
+        
+    }
+
+    public void RemoveModuleComponent(ModuleObjectComponentType componentType)
+    {
+        
     }
 }

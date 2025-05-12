@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GoToSystem : MonoBehaviour
+public class GoToSystem : MonoBehaviour, ICSharpModifiable
 {
     [SerializeField] private Transform goToMarker;
     private GameObject player;
@@ -42,5 +42,15 @@ public class GoToSystem : MonoBehaviour
     private void PlayerGoTo()
     {
         player.transform.position = goToMarker.position;
+    }
+    
+    public void ApplyModuleComponent(ModuleObjectComponentType componentType)
+    {
+        
+    }
+
+    public void RemoveModuleComponent(ModuleObjectComponentType componentType)
+    {
+        
     }
 }

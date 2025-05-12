@@ -14,6 +14,7 @@ public class Module : MonoBehaviour
     [SerializeField] private List<ModuleObject> _availableObjects;
     [SerializeField] private List<ModuleCodeableArea> _availableAreas;
     [SerializeField] private float _panTime = 0.5f;
+    private Dictionary<Vector3, GameObject> _placedObjects = new Dictionary<Vector3, GameObject>();
     private HashSet<Vector3> occupiedTiles = new HashSet<Vector3>();
     private List<PointerBlock> pointerBlocks = new List<PointerBlock>();
     [SerializeField] private int currentTargetID;
@@ -25,6 +26,12 @@ public class Module : MonoBehaviour
     private Camera mainCamera;
     private CameraFollow mainCameraFollow;
     private float originalCameraZoom;
+
+    public Dictionary<Vector3, GameObject> PlacedObjects
+    {
+        get => _placedObjects;
+        set => _placedObjects = value;
+    }
     
     public Transform PlacedObjectsParent
     {
@@ -117,7 +124,21 @@ public class Module : MonoBehaviour
             yield return null;
         }
     }
+
+    public bool TryGetPlacedObject(Vector3 position, out GameObject placedObject)
+    {
+        return _placedObjects.TryGetValue(position, out placedObject);
+    }
     
+    public void RegisterPlacedObject(Vector3 position, GameObject placedObject)
+    {
+        _placedObjects[position] = placedObject;
+    }
+
+    public void RemovePlacedObject(Vector3 position)
+    {
+        _placedObjects.Remove(position);
+    }
     public void AssignPointerBlockIDs()
     {
         List<ModuleObject> futurePointerBlocks = new();

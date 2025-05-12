@@ -52,6 +52,7 @@ public class ModuleChildDraggable : MonoBehaviour
                     ModuleUIManager.Instance.GridHighlight.SetActive(true);
                     break;
                 }
+                ModuleUIManager.Instance.GridHighlight.SetActive(false);
             }
 
             if (spriteRenderer != null)

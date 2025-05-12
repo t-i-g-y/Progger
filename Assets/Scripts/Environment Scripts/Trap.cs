@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-public class Trap : MonoBehaviour
+public class Trap : MonoBehaviour, ICSharpModifiable
 {
     [SerializeField] private float _bounceForce;
     [SerializeField] private float _trapDamage;
@@ -26,5 +26,15 @@ public class Trap : MonoBehaviour
             }
             HandlePlayerBounce(collision.gameObject);
         }
+    }
+    
+    public void ApplyModuleComponent(ModuleObjectComponentType componentType)
+    {
+        
+    }
+
+    public void RemoveModuleComponent(ModuleObjectComponentType componentType)
+    {
+        
     }
 }

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
-public class PointerBlock : MonoBehaviour
+public class PointerBlock : MonoBehaviour, ICSharpModifiable
 {
     private Module module;
     private SpriteRenderer spriteRenderer;
@@ -69,6 +69,16 @@ public class PointerBlock : MonoBehaviour
     {
         _isActivated = false;
         spriteRenderer.color = _deactivatedColor;
+    }
+
+    public void ApplyModuleComponent(ModuleObjectComponentType componentType)
+    {
+        
+    }
+
+    public void RemoveModuleComponent(ModuleObjectComponentType componentType)
+    {
+        
     }
 }
 

@@ -10,8 +10,12 @@ public class ModuleObject
     public bool IsPlaced;
     public bool IsMultipart;
 
-    [Header("PointerBlock")] 
+    [Header("C++ PointerBlock")] 
     public bool IsPointer;
     public int SourceID;
     public int TargetID;
+    
+    [Header("C# ObjectComponent")]
+    public bool IsCSharpComponent;
+    public ModuleObjectComponentType ComponentType;
 }

@@ -8,7 +8,7 @@ public class SaveController : MonoBehaviour
     private string _saveLocation;
 
     private PlayerInventoryController _inventoryController;
-    // Start is called before the first frame update
+    
     void Start()
     {
         _saveLocation = Path.Combine(Application.persistentDataPath, "saveData.json");

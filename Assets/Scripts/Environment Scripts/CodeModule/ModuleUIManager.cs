@@ -107,6 +107,7 @@ public class ModuleUIManager : MonoBehaviour
         }
         currentModule.ResetPointerBlocks();
         currentModule.OccupiedTiles.Clear();
+        currentModule.PlacedObjects.Clear();
         ClearPalette();
         currentModule.PointerBlocks.Clear();
         PopulatePalette(currentModule.AvailableObjects);

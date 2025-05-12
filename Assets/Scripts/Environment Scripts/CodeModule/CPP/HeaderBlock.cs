@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-public class HeaderBlock : MonoBehaviour
+public class HeaderBlock : MonoBehaviour, ICSharpModifiable
 {
     [SerializeField] private GameObject _codeableAreaPrefab;
     private GameObject instantiatedArea;
@@ -31,5 +31,15 @@ public class HeaderBlock : MonoBehaviour
             codeableArea = null;
             Destroy(instantiatedArea);
         }
+    }
+    
+    public void ApplyModuleComponent(ModuleObjectComponentType componentType)
+    {
+        
+    }
+
+    public void RemoveModuleComponent(ModuleObjectComponentType componentType)
+    {
+        
     }
 }
