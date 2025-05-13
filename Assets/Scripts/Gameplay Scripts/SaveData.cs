@@ -6,5 +6,12 @@ using UnityEngine;
 public class SaveData
 {
     public Vector3 playerPosition;
-    public List<InventorySaveData> inventorySaveData;
+    public float playerHealth;
+    public List<ProgrammingLanguage> unlockedAbilities;
+
+    public List<InventorySaveData> sqlInventory;
+    public List<int> upgradeComponentIDs;
+    public List<CodexEntryData> collectedCodex;
+
+    public List<ModuleSaveData> savedModules;
 }

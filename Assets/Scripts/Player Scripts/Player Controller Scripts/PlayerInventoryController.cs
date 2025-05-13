@@ -33,6 +33,12 @@ public class PlayerInventoryController : MonoBehaviour
     [Header("C# Component Inventory")]
     [SerializeField] private Transform _cSharpInventoryContent;
     
+    [Header("Codex Inventory")]
+    [SerializeField] private Transform _codexContentArea;
+    [SerializeField] private GameObject _codexEntryPrefab;
+    private List<CodexEntryData> collectedCodex = new();
+    private static int codexIDCounter = 0;
+    
     private List<UpgradeComponentItem> csharpComponents = new();
 
     public List<UpgradeComponentItem> CsharpComponents
@@ -168,6 +174,8 @@ public class PlayerInventoryController : MonoBehaviour
         for (int i = 0; i < _cSharpInventoryContent.childCount; i++)
             Destroy(_cSharpInventoryContent.GetChild(i).gameObject);
         
+        csharpComponents.Sort((a, b) => a.ID.CompareTo(b.ID));
+        
         for (int i = 0; i < csharpComponents.Count; i++)
         {
             GameObject row = Instantiate(_rowPrefab, _cSharpInventoryContent);
@@ -240,7 +248,7 @@ public class PlayerInventoryController : MonoBehaviour
         SQLRows.Clear();
         for (int i = 0; i < _SQLInventoryContent.childCount; i++)
             Destroy(_SQLInventoryContent.GetChild(i).gameObject);
-        
+        SQLItems.Sort((a, b) => a.ID.CompareTo(b.ID));
         selectedIndex = 0;
         
         for (int i = 0; i < SQLItems.Count; i++)
@@ -275,4 +283,98 @@ public class PlayerInventoryController : MonoBehaviour
             _singleSlotIcon.enabled = false;
         }
     }
+    
+    public void CollectCodexItem(CodexItem item)
+    {
+        if (collectedCodex.Exists(t => t.language == item.language))
+            return;
+
+        collectedCodex.Add(new CodexEntryData
+        {
+            ID = ++codexIDCounter,
+            language = item.language,
+            codexText = item.codexText
+        });
+
+        RefreshCodexTab();
+    }
+
+    public void RefreshCodexTab()
+    {
+        foreach (Transform child in _codexContentArea)
+            Destroy(child.gameObject);
+
+        collectedCodex.Sort((a, b) => a.language.CompareTo(b.language));
+
+        foreach (var entry in collectedCodex)
+        {
+            GameObject row = Instantiate(_codexEntryPrefab, _codexContentArea);
+            row.GetComponent<CodexEntryUI>().Initialize(entry);
+        }
+    }
+    
+    public List<InventorySaveData> GetSQLInventoryData()
+    {
+        List<InventorySaveData> data = new();
+        for (int i = 0; i < SQLItems.Count; i++)
+        {
+            data.Add(new InventorySaveData
+            {
+                itemID = SQLItems[i].PrefabID,
+                slotIndex = i
+            });
+        }
+        return data;
+    }
+
+    public List<int> GetUpgradeComponentIDs()
+    {
+        List<int> ids = new();
+        foreach (var comp in csharpComponents)
+            ids.Add(comp.ID);
+        return ids;
+    }
+
+    public List<CodexEntryData> GetCodexData() => collectedCodex;
+    
+    public void LoadInventoryFromSave(SaveData save)
+    {
+        SQLItems.Clear();
+        csharpComponents.Clear();
+        collectedCodex.Clear();
+        
+        foreach (var item in save.sqlInventory)
+        {
+            GameObject prefab = ItemRegistry.GetPlayerItemByID(item.itemID);
+            if (!prefab) 
+                continue;
+            GameObject obj = Instantiate(prefab);
+            PlayerItem itemComp = obj.GetComponent<PlayerItem>();
+            itemComp.PrefabID = item.itemID;
+            SQLItems.Add(itemComp);
+            obj.SetActive(false);
+        }
+        RefreshSQLInventory();
+        
+        foreach (var compID in save.upgradeComponentIDs)
+        {
+            UpgradeComponentData data = UpgradeComponentDataRegistry.GetByID(compID);
+            if (data == null) 
+                continue;
+
+            GameObject obj = Instantiate(_rowPrefab);
+            var wrapper = obj.AddComponent<UpgradeComponentItem>();
+            wrapper.ID = compID;
+            wrapper.componentData = data;
+            csharpComponents.Add(wrapper);
+        }
+        RefreshComponentInventory();
+        
+        foreach (var codex in save.collectedCodex)
+        {
+            collectedCodex.Add(codex);
+        }
+        RefreshCodexTab();
+    }
+
 }

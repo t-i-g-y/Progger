@@ -56,6 +56,24 @@ public class AbilityManager : MonoBehaviour
         Debug.Log("C# Activated");
     }
     public bool AbilityUnlocked(ProgrammingLanguage language) => unlockedAbilities.Contains(language);
+    public List<ProgrammingLanguage> GetUnlockedAbilities()
+    {
+        List<ProgrammingLanguage> result = new();
+        foreach (ProgrammingLanguage lang in Enum.GetValues(typeof(ProgrammingLanguage)))
+        {
+            if (AbilityUnlocked(lang))
+                result.Add(lang);
+        }
+        return result;
+    }
+
+    public void LoadUnlockedAbilities(List<ProgrammingLanguage> unlocked)
+    {
+        foreach (var lang in unlocked)
+        {
+            UnlockAbility(lang);
+        }
+    }
 
     public void UnlockAbility(ProgrammingLanguage language)
     {

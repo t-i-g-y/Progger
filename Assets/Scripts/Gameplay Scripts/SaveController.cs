@@ -22,23 +22,35 @@ public class SaveController : MonoBehaviour
         SaveData saveData = new SaveData
         {
             playerPosition = GameObject.FindGameObjectWithTag(TagManager.PLAYER_TAG).transform.position,
-            //inventorySaveData = _inventoryController.GetInventoryItems()
+            playerHealth = GameObject.FindGameObjectWithTag(TagManager.PLAYER_TAG).GetComponent<PlayerHealth>().TotalHealth,
+            unlockedAbilities = AbilityManager.Instance.GetUnlockedAbilities(),
+            sqlInventory = _inventoryController.GetSQLInventoryData(),
+            upgradeComponentIDs = _inventoryController.GetUpgradeComponentIDs(),
+            collectedCodex = _inventoryController.GetCodexData(),
+            savedModules = ModuleSaveHelper.SaveAllModules()
         };
-        
+
         File.WriteAllText(_saveLocation, JsonUtility.ToJson(saveData));
     }
 
     public void LoadGame()
     {
-        if (File.Exists(_saveLocation))
-        {
-            SaveData saveData = JsonUtility.FromJson<SaveData>(File.ReadAllText(_saveLocation));
-            GameObject.FindGameObjectWithTag(TagManager.PLAYER_TAG).transform.position = saveData.playerPosition;
-            //_inventoryController.SetInventoryItems(saveData.inventorySaveData);
-        }
-        else
+        if (!File.Exists(_saveLocation))
         {
             SaveGame();
+            return;
         }
+
+        SaveData saveData = JsonUtility.FromJson<SaveData>(File.ReadAllText(_saveLocation));
+
+        GameObject player = GameObject.FindGameObjectWithTag(TagManager.PLAYER_TAG);
+        player.transform.position = saveData.playerPosition;
+        player.GetComponent<PlayerHealth>().SetHealth(saveData.playerHealth);
+
+        AbilityManager.Instance.LoadUnlockedAbilities(saveData.unlockedAbilities);
+
+        _inventoryController.LoadInventoryFromSave(saveData);
+
+        ModuleSaveHelper.LoadAllModules(saveData.savedModules);
     }
 }

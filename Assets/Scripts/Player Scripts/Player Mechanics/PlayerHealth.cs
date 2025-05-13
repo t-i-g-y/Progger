@@ -14,7 +14,8 @@ public class PlayerHealth : MonoBehaviour
     private SpriteRenderer spriteRenderer;
     [SerializeField] private float _maxHealth = 3f;
     [SerializeField] private HealthUI _healthUI;
-    
+
+    public static event Action OnPlayerDied;
     public float TotalHealth => health + extraHealth;
     private void Awake()
     {
@@ -33,10 +34,10 @@ public class PlayerHealth : MonoBehaviour
         StartCoroutine(DamageFlashRedCoroutine());
         if (health <= 0f)
         {
-            Destroy(gameObject);
+            OnPlayerDied.Invoke();
         }
     }
-
+    
     private IEnumerator DamageFlashRedCoroutine()
     {
         spriteRenderer.color = Color.red;
@@ -52,7 +53,12 @@ public class PlayerHealth : MonoBehaviour
         StartCoroutine(HealFlashGreenCoroutine());
         _healthUI.UpdateHearts(health);
     }
-
+    
+    public void SetHealth(float health)
+    {
+        this.health = Mathf.Clamp(health, 0, _maxHealth);
+        _healthUI.UpdateHearts(health);
+    }
     private IEnumerator HealFlashGreenCoroutine()
     {
         float duration = 0.2f;

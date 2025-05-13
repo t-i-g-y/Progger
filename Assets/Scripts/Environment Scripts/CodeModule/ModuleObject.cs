@@ -7,6 +7,7 @@ public class ModuleObject
 {
     [Header("General")]
     public GameObject Prefab;
+    public int PrefabID;
     public bool IsPlaced;
     public bool IsMultipart;
 
