@@ -48,6 +48,6 @@ MonoBehaviour:
     serializedVersion: 2
     x: 0
     y: 0
-    width: 0
-    height: 0
+    width: 3
+    height: 3
   _codeableAreaPrefab: {fileID: 7036701954716158520, guid: 8eedd84fa8e770c49b5e994d1ea8ff88, type: 3}

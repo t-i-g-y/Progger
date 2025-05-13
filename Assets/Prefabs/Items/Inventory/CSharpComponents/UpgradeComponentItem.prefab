@@ -145,8 +145,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PrefabID: 0
   ID: 0
-  ItemName: 
+  ItemName: "+50% \u041F\u0440\u044B\u0436\u043E\u043A"
   ItemIcon: {fileID: 0}
   componentData:
-    type: 0
+    type: 2
     value: 0
