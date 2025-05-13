@@ -6,8 +6,7 @@ public class SaveSlotUIManager : MonoBehaviour
 {
     [SerializeField] private SlotUI[] slots = new SlotUI[3];
     [SerializeField] private SaveController saveController;
-    private string _saveSlot = "slot1";
-    private string SavePath => Path.Combine(Application.persistentDataPath, $"{_saveSlot}.json");
+    
     private void Start()
     {
         for (int i = 0; i < slots.Length; i++)
@@ -57,10 +56,5 @@ public class SaveSlotUIManager : MonoBehaviour
     private string GetSlotPath(int slotIndex)
     {
         return Path.Combine(Application.persistentDataPath, $"slot{slotIndex}.json");
-    }
-    
-    public void SetSaveSlot(int slotIndex)
-    {
-        _saveSlot = $"slot{Mathf.Clamp(slotIndex, 1, 3)}";
     }
 }

@@ -23,6 +23,7 @@ public class PlayerHealth : MonoBehaviour
         health = _maxHealth;
         extraHealth = 0;
         _healthUI.SetMaxHearts(_maxHealth);
+        GameController.OnReset += ResetHealth;
     }
     
     public void TakeDamage(float damage)
@@ -58,6 +59,13 @@ public class PlayerHealth : MonoBehaviour
     {
         this.health = Mathf.Clamp(health, 0, _maxHealth);
         _healthUI.UpdateHearts(health);
+    }
+
+    public void ResetHealth()
+    {
+        health = _maxHealth;
+        _healthUI.UpdateHearts(health);
+        OnPlayerDied.Invoke();
     }
     private IEnumerator HealFlashGreenCoroutine()
     {

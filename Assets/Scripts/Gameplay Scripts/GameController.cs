@@ -7,6 +7,7 @@ public class GameController : MonoBehaviour
 {
     [SerializeField] private GameObject _gameOverScreen;
     [SerializeField] private GameObject _player;
+    public static event Action OnReset;
     private void Start()
     {
         PlayerHealth.OnPlayerDied += GameOverScreen;
@@ -18,8 +19,10 @@ public class GameController : MonoBehaviour
         _gameOverScreen.SetActive(true);
     }
 
-    private void Respawn()
+    public void Respawn()
     {
         _gameOverScreen.SetActive(false);
+        _player.transform.position = new Vector3(0, 0, 0);
+        OnReset?.Invoke();
     }
 }

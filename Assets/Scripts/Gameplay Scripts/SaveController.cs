@@ -6,8 +6,9 @@ using UnityEngine;
 public class SaveController : MonoBehaviour
 {
     private string _saveLocation;
-
     private PlayerInventoryController _inventoryController;
+    private string _saveSlot = "slot1";
+    private string SavePath => Path.Combine(Application.persistentDataPath, $"{_saveSlot}.json");
     
     void Start()
     {
@@ -52,5 +53,10 @@ public class SaveController : MonoBehaviour
         _inventoryController.LoadInventoryFromSave(saveData);
 
         ModuleSaveHelper.LoadAllModules(saveData.savedModules);
+    }
+    
+    public void SetSaveSlot(int slotIndex)
+    {
+        _saveSlot = $"slot{Mathf.Clamp(slotIndex, 1, 3)}";
     }
 }
