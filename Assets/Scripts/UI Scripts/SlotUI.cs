@@ -9,6 +9,6 @@ public class SlotUI
 {
     public Button saveButton;
     public Button loadButton;
-    public Button deleteButton; // <== NEW
+    public Button deleteButton;
     public TMP_Text statusText;
 }

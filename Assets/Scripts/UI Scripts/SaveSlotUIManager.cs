@@ -29,12 +29,32 @@ public class SaveSlotUIManager : MonoBehaviour
                     saveController.LoadGame();
                 }
             });
+            
+            slots[i].deleteButton.onClick.AddListener(() =>
+            {
+                saveController.SetSaveSlot(slotIndex);
+
+                SaveData emptyData = new SaveData
+                {
+                    playerPosition = Vector3.zero,
+                    playerHealth = 3,
+                    unlockedAbilities = new List<ProgrammingLanguage>(),
+                    sqlInventory = new List<InventorySaveData>(),
+                    upgradeComponentIDs = new List<int>(),
+                    collectedCodex = new List<CodexEntryData>(),
+                    savedModules = new List<ModuleSaveData>()
+                };
+
+                File.WriteAllText(GetSlotPath(slotIndex), JsonUtility.ToJson(emptyData));
+                Debug.Log($"Slot {slotIndex} reset to default.");
+                RefreshUI();
+            });
         }
 
         RefreshUI();
     }
 
-    private void RefreshUI()
+    public void RefreshUI()
     {
         for (int i = 0; i < slots.Length; i++)
         {
@@ -44,17 +64,27 @@ public class SaveSlotUIManager : MonoBehaviour
             if (File.Exists(path))
             {
                 string timestamp = File.GetLastWriteTime(path).ToString("g");
-                slots[i].statusText.text = $"Saved: {timestamp}";
+                SaveData data = JsonUtility.FromJson<SaveData>(File.ReadAllText(path));
+
+                slots[i].statusText.text = IsEmpty(data) ? "ПУСТО" : $"СОХРАНЕНО: {timestamp}";
             }
             else
             {
-                slots[i].statusText.text = "Empty";
+                slots[i].statusText.text = "ПУСТО";
             }
         }
     }
-
+    
     private string GetSlotPath(int slotIndex)
     {
         return Path.Combine(Application.persistentDataPath, $"slot{slotIndex}.json");
+    }
+
+    private bool IsEmpty(SaveData data)
+    {
+        bool playerStatCheck = data.playerPosition == Vector3.zero && data.playerHealth == 3;
+        bool playerAbilityCheck = data.unlockedAbilities.Count == 0;
+        bool inventoryCheck = data.sqlInventory.Count == 0 && data.upgradeComponentIDs.Count == 0 && data.collectedCodex.Count == 0;
+        return playerStatCheck && playerAbilityCheck && inventoryCheck;
     }
 }

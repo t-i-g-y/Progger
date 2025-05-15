@@ -12,7 +12,7 @@ public class SaveController : MonoBehaviour
     
     void Start()
     {
-        _saveLocation = Path.Combine(Application.persistentDataPath, "saveData.json");
+        _saveLocation = SavePath;
         _inventoryController = FindObjectOfType<PlayerInventoryController>();
         Debug.Log(_saveLocation);
         LoadGame();
@@ -31,7 +31,7 @@ public class SaveController : MonoBehaviour
             savedModules = ModuleSaveHelper.SaveAllModules()
         };
 
-        File.WriteAllText(_saveLocation, JsonUtility.ToJson(saveData));
+        File.WriteAllText(SavePath, JsonUtility.ToJson(saveData));
     }
 
     public void LoadGame()
@@ -42,7 +42,7 @@ public class SaveController : MonoBehaviour
             return;
         }
 
-        SaveData saveData = JsonUtility.FromJson<SaveData>(File.ReadAllText(_saveLocation));
+        SaveData saveData = JsonUtility.FromJson<SaveData>(File.ReadAllText(SavePath));
 
         GameObject player = GameObject.FindGameObjectWithTag(TagManager.PLAYER_TAG);
         player.transform.position = saveData.playerPosition;
@@ -58,5 +58,6 @@ public class SaveController : MonoBehaviour
     public void SetSaveSlot(int slotIndex)
     {
         _saveSlot = $"slot{Mathf.Clamp(slotIndex, 1, 3)}";
+        Debug.Log(_saveSlot);
     }
 }
