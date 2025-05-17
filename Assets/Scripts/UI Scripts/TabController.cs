@@ -7,12 +7,14 @@ public class TabController : MonoBehaviour
 {
     [SerializeField] private Image[] _tabImages;
     [SerializeField] private GameObject[] _pages;
+    [SerializeField] private bool _isStartMenu;
     private bool CSharpAlreadyUnlocked;
     private bool SQLAlreadyUnlocked;
     private int lastTab;
     void Start()
     {
-        ActivateTab(0);
+        if (!_isStartMenu)
+            ActivateTab(0);
     }
 
     public void ActivateTab(int tab)
@@ -20,20 +22,25 @@ public class TabController : MonoBehaviour
         for (int i = 0; i < _pages.Length; i++)
         {
             _pages[i].SetActive(false);
-            _tabImages[i].color = Color.grey;
+            if (!_isStartMenu)
+                _tabImages[i].color = Color.grey;
         }
 
-        if (!CSharpAlreadyUnlocked && tab == (int)MenuPages.Player && AbilityManager.Instance.AbilityUnlocked(ProgrammingLanguage.CSharp))
+        if (!_isStartMenu)
         {
-            _pages[tab].transform.GetChild(0).gameObject.SetActive(true);
-            UpgradeComponentManager.Instance.BuildComponentList();
-            CSharpAlreadyUnlocked = true;
+            if (!CSharpAlreadyUnlocked && tab == (int)MenuPages.Player && AbilityManager.Instance.AbilityUnlocked(ProgrammingLanguage.CSharp))
+            {
+                _pages[tab].transform.GetChild(0).gameObject.SetActive(true);
+                UpgradeComponentManager.Instance.BuildComponentList();
+                CSharpAlreadyUnlocked = true;
+            }
+            else if (!SQLAlreadyUnlocked && tab == (int)MenuPages.Inventory && AbilityManager.Instance.AbilityUnlocked(ProgrammingLanguage.SQL))
+            {
+                _pages[tab].transform.GetChild(0).gameObject.SetActive(true);
+                SQLAlreadyUnlocked = true;
+            }
         }
-        else if (!SQLAlreadyUnlocked && tab == (int)MenuPages.Inventory && AbilityManager.Instance.AbilityUnlocked(ProgrammingLanguage.SQL))
-        {
-            _pages[tab].transform.GetChild(0).gameObject.SetActive(true);
-            SQLAlreadyUnlocked = true;
-        }
+        
         _pages[tab].SetActive(true);
         _tabImages[tab].color = Color.white;
         lastTab = tab;

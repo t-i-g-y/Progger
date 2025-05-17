@@ -1846,6 +1846,7 @@ MonoBehaviour:
   - {fileID: 954789845}
   - {fileID: 817467238}
   - {fileID: 1352171070}
+  _isStartMenu: 0
 --- !u!114 &164839848
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2493,6 +2494,7 @@ MonoBehaviour:
   - {fileID: 1380572704}
   - {fileID: 1258931044}
   - {fileID: 1209812094}
+  _isStartMenu: 0
 --- !u!114 &262990087
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5668,6 +5670,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84d3b845354ff2e4a8f21424021588a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _isStartMenu: 0
 --- !u!4 &746030968
 Transform:
   m_ObjectHideFlags: 0
@@ -8426,6 +8429,7 @@ MonoBehaviour:
   _pages:
   - {fileID: 70726556}
   - {fileID: 2038901704}
+  _isStartMenu: 0
 --- !u!114 &1031227298
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20585,7 +20589,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9eba6a48ad1d1446bfb961df72d1979, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  slots:
+  _slots:
   - saveButton: {fileID: 1769131318}
     loadButton: {fileID: 1803068869}
     deleteButton: {fileID: 2111197828}
@@ -20598,7 +20602,8 @@ MonoBehaviour:
     loadButton: {fileID: 1902897929}
     deleteButton: {fileID: 1728377159}
     statusText: {fileID: 576000217}
-  saveController: {fileID: 746030967}
+  _saveController: {fileID: 746030967}
+  _isStartMenu: 0
 --- !u!1 &1943567885
 GameObject:
   m_ObjectHideFlags: 0

@@ -5,17 +5,21 @@ using UnityEngine;
 
 public class SaveController : MonoBehaviour
 {
+    [SerializeField] private bool _isStartMenu;
     private string _saveLocation;
     private PlayerInventoryController _inventoryController;
-    private string _saveSlot = "slot1";
+    private static string _saveSlot = "slot1";
     private string SavePath => Path.Combine(Application.persistentDataPath, $"{_saveSlot}.json");
     
     void Start()
     {
         _saveLocation = SavePath;
-        _inventoryController = FindObjectOfType<PlayerInventoryController>();
+        if (!_isStartMenu)
+        {
+            _inventoryController = FindObjectOfType<PlayerInventoryController>();
+            LoadGame();
+        }
         Debug.Log(_saveLocation);
-        LoadGame();
     }
 
     public void SaveGame()

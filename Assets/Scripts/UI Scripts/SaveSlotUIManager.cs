@@ -2,61 +2,96 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using UnityEngine.Serialization;
+using UnityEngine.SceneManagement;
+
 public class SaveSlotUIManager : MonoBehaviour
 {
-    [SerializeField] private SlotUI[] slots = new SlotUI[3];
-    [SerializeField] private SaveController saveController;
-    
+    [SerializeField] private SlotUI[] _slots = new SlotUI[3];
+    [SerializeField] private SaveController _saveController;
+    [SerializeField] private bool _isStartMenu;
     private void Start()
     {
-        for (int i = 0; i < slots.Length; i++)
+        for (int i = 0; i < _slots.Length; i++)
         {
             int slotIndex = i + 1;
             string path = GetSlotPath(slotIndex);
 
-            slots[i].saveButton.onClick.AddListener(() =>
+            if (!_isStartMenu)
             {
-                saveController.SetSaveSlot(slotIndex);
-                saveController.SaveGame();
-                RefreshUI();
-            });
-
-            slots[i].loadButton.onClick.AddListener(() =>
-            {
-                if (File.Exists(path))
+                _slots[i].saveButton.onClick.AddListener(() =>
                 {
-                    saveController.SetSaveSlot(slotIndex);
-                    saveController.LoadGame();
-                }
-            });
+                    _saveController.SetSaveSlot(slotIndex);
+                    _saveController.SaveGame();
+                    RefreshUI();
+                });
+
+                _slots[i].loadButton.onClick.AddListener(() =>
+                {
+                    if (File.Exists(path))
+                    {
+                        _saveController.SetSaveSlot(slotIndex);
+                        _saveController.LoadGame();
+                    }
+                });
             
-            slots[i].deleteButton.onClick.AddListener(() =>
-            {
-                saveController.SetSaveSlot(slotIndex);
-
-                SaveData emptyData = new SaveData
+                _slots[i].deleteButton.onClick.AddListener(() =>
                 {
-                    playerPosition = Vector3.zero,
-                    playerHealth = 3,
-                    unlockedAbilities = new List<ProgrammingLanguage>(),
-                    sqlInventory = new List<InventorySaveData>(),
-                    upgradeComponentIDs = new List<int>(),
-                    collectedCodex = new List<CodexEntryData>(),
-                    savedModules = new List<ModuleSaveData>()
-                };
+                    _saveController.SetSaveSlot(slotIndex);
 
-                File.WriteAllText(GetSlotPath(slotIndex), JsonUtility.ToJson(emptyData));
-                Debug.Log($"Slot {slotIndex} reset to default.");
-                RefreshUI();
-            });
+                    SaveData emptyData = new SaveData
+                    {
+                        playerPosition = Vector3.zero,
+                        playerHealth = 3,
+                        unlockedAbilities = new List<ProgrammingLanguage>(),
+                        sqlInventory = new List<InventorySaveData>(),
+                        upgradeComponentIDs = new List<int>(),
+                        collectedCodex = new List<CodexEntryData>(),
+                        savedModules = new List<ModuleSaveData>()
+                    };
+
+                    File.WriteAllText(GetSlotPath(slotIndex), JsonUtility.ToJson(emptyData));
+                    Debug.Log($"Slot {slotIndex} reset to default.");
+                    RefreshUI();
+                });
+            }
+            else
+            {
+                _slots[i].saveButton.onClick.AddListener(() =>
+                {
+                    _saveController.SetSaveSlot(slotIndex);
+
+                    SaveData emptyData = new SaveData
+                    {
+                        playerPosition = Vector3.zero,
+                        playerHealth = 3,
+                        unlockedAbilities = new List<ProgrammingLanguage>(),
+                        sqlInventory = new List<InventorySaveData>(),
+                        upgradeComponentIDs = new List<int>(),
+                        collectedCodex = new List<CodexEntryData>(),
+                        savedModules = new List<ModuleSaveData>()
+                    };
+
+                    File.WriteAllText(GetSlotPath(slotIndex), JsonUtility.ToJson(emptyData));
+                    SceneManager.LoadScene("GameScene");
+                });
+
+                _slots[i].loadButton.onClick.AddListener(() =>
+                {
+                    if (File.Exists(path))
+                    {
+                        _saveController.SetSaveSlot(slotIndex);
+                        SceneManager.LoadScene("GameScene");
+                    }
+                });
+            }
         }
-
         RefreshUI();
     }
 
     public void RefreshUI()
     {
-        for (int i = 0; i < slots.Length; i++)
+        for (int i = 0; i < _slots.Length; i++)
         {
             int slotIndex = i + 1;
             string path = GetSlotPath(slotIndex);
@@ -66,11 +101,11 @@ public class SaveSlotUIManager : MonoBehaviour
                 string timestamp = File.GetLastWriteTime(path).ToString("g");
                 SaveData data = JsonUtility.FromJson<SaveData>(File.ReadAllText(path));
 
-                slots[i].statusText.text = IsEmpty(data) ? "ПУСТО" : $"СОХРАНЕНО: {timestamp}";
+                _slots[i].statusText.text = IsEmpty(data) ? "ПУСТО" : $"СОХРАНЕНО: {timestamp}";
             }
             else
             {
-                slots[i].statusText.text = "ПУСТО";
+                _slots[i].statusText.text = "ПУСТО";
             }
         }
     }
