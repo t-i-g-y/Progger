@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a15b33dc90e80274dbd8db5e1419c338, type: 3}
+  m_Name: SQLUnlockDialogue
+  m_EditorClassIdentifier: 
+  npcName: "SQL - \u0418\u043D\u0432\u0435\u043D\u0442\u0430\u0440\u044C"
+  npcPortrait: {fileID: 21300000, guid: 48b4de02933fe044da00eb805b9e26fb, type: 3}
+  dialogueLines:
+  - "\u0412\u044B \u0438\u0437\u0443\u0447\u0438\u043B\u0438 SQL! "
+  - "\u0422\u0435\u043F\u0435\u0440\u044C \u0443 \u0412\u0430\u0441 \u043A\u043E\u043D\u0442\u0440\u043E\u043B\u044C
+    \u043D\u0430 \u043F\u0440\u0435\u0434\u043C\u0435\u0442\u0430\u043C\u0438!"
+  - "\u041F\u0435\u0440\u0435\u0439\u0434\u0438\u0442\u0435 \u0432 \"\u0418\u043D\u0432\u0435\u043D\u0442\u0430\u0440\u044C\"
+    \u0438 \u0441\u043B\u0435\u0434\u0438\u0442\u0435 \u0437\u0430 \u043A\u043E\u043B\u043B\u0435\u043A\u0446\u0438\u0435\u0439!"
+  typingSpeed: 0.05
+  voiceSound: {fileID: 0}
+  voicePitch: 1
+  autoProgressLines: 000000
+  autoProgressDelay: []
