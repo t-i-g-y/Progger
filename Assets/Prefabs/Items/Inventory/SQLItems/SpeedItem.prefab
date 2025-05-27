@@ -144,7 +144,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabID: 0
-  ItemName: SpeedItem
-  EffectType: 1
-  EffectValue: 5
+  ID: 0
+  ItemName: "\u0411\u0443\u0441\u0442 \u0441\u043A\u043E\u0440\u043E\u0441\u0442\u0438"
   ItemIcon: {fileID: 0}
+  EffectType: 1
+  EffectValue: 0.5

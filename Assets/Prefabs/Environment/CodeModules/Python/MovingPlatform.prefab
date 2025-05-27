@@ -317,7 +317,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _pointA: {fileID: 812828460248589409}
   _pointB: {fileID: 701925977889501111}
-  _moveSpeed: 2
+  _moveSpeed: 3
 --- !u!1 &8169308692988892555
 GameObject:
   m_ObjectHideFlags: 0

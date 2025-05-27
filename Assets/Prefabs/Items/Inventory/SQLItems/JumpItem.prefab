@@ -144,7 +144,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PrefabID: 0
-  ItemName: JumpItem
-  EffectType: 2
-  EffectValue: 5
+  ID: 0
+  ItemName: "\u0411\u0443\u0441\u0442 \u043F\u0440\u044B\u0436\u043A\u0430"
   ItemIcon: {fileID: 0}
+  EffectType: 2
+  EffectValue: 0.75

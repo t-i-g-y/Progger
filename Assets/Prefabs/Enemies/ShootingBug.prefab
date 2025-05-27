@@ -107,10 +107,10 @@ SpriteRenderer:
   m_SortingLayerID: 1744258385
   m_SortingLayer: 3
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 5063184263d97fb4b9109b2e174c08b3, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Sprite: {fileID: 669968328, guid: 9101e36ca2679844f8ceff39b11a92df, type: 3}
+  m_Color: {r: 0.6886792, g: 0, b: 0, a: 1}
   m_FlipX: 0
-  m_FlipY: 1
+  m_FlipY: 0
   m_DrawMode: 0
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
@@ -165,7 +165,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 412cfaf52a4a0bf4699f64f4226db7cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bullet: {fileID: 710846131150835926, guid: ee71a77331124c0478d98038ca493ab9, type: 3}
-  collisionDamage: 0.5
-  minShootTime: 2
-  maxShootTime: 5
+  _bullet: {fileID: 710846131150835926, guid: ee71a77331124c0478d98038ca493ab9, type: 3}
+  _collisionDamage: 0.5
+  _minShootTime: 2
+  _maxShootTime: 5

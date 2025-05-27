@@ -145,7 +145,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 606273511
   m_SortingLayer: 4
-  m_SortingOrder: 0
+  m_SortingOrder: 10
   m_Sprite: {fileID: 559975666, guid: 9101e36ca2679844f8ceff39b11a92df, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -403,14 +403,14 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   _groundCheck: {fileID: 3823472437737740070}
-  _groundCheckSize: {x: 0.5, y: 0.1}
+  _groundCheckSize: {x: 0.5, y: 0.05}
   _dropTime: 0.25
   _baseGravity: 2
   _maxFallSpeed: 15
   _fallMultiplier: 2
-  _dashSpeed: 20
+  _dashSpeed: 50
   _dashDuration: 0.1
-  _dashCooldown: 1
+  _dashCooldown: 5
   _wallCheck: {fileID: 4059238811034845578}
   _wallCheckSize: {x: 0.5, y: 0.05}
   _wallMask:
@@ -447,11 +447,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ebb4b61ec9220934bbe886a2abca8148, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  snakeSegmentPrefab: {fileID: 5383984679197322172, guid: 8b13638e0de4c2840b9d4d0a61ffb0e5, type: 3}
-  maxSegments: 24
+  _headSegmentPrefab: {fileID: 5383984679197322172, guid: f061b8386f166ff46a4a8287f85c1104, type: 3}
+  _bodySegmentPrefab: {fileID: 5383984679197322172, guid: 8b13638e0de4c2840b9d4d0a61ffb0e5, type: 3}
+  _maxSegments: 12
   segmentHeight: 0.5
   growDelay: 0.1
   cooldownTime: 5
+  snakeLifetime: 10
   ceilingMask:
     serializedVersion: 2
     m_Bits: 64
@@ -480,7 +482,7 @@ Transform:
   m_GameObject: {fileID: 8916721385108336601}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.5, z: 0}
+  m_LocalPosition: {x: 0, y: -0.48, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

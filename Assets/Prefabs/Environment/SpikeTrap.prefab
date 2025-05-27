@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 9119496469277480631}
   - component: {fileID: 3437884036939179764}
   - component: {fileID: 2996288405939084485}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: SpikeTrap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -95,7 +95,7 @@ BoxCollider2D:
   m_GameObject: {fileID: 1872966788036288329}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 2a33b4d18cd073a45831cf5e8cf19d36, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -143,5 +143,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2328e4486cbda44e9f9b2a078c893b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bounceForce: 10
-  trapDamage: 1
+  _bounceForce: 8
+  _trapDamage: 0.5
